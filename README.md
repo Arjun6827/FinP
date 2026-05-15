@@ -130,7 +130,30 @@ npm run dev
 
 ---
 
+## 📱 Offline Mode / PWA Testing
+
+FinPilot is designed with an offline-first architecture. To test the Progressive Web App (PWA) capabilities (which are disabled by default in development mode):
+
+1. Navigate to the frontend directory:
+   ```bash
+   cd frontend
+   ```
+2. Build the production application:
+   ```bash
+   npm run build
+   ```
+3. Preview the production build:
+   ```bash
+   npm run preview
+   ```
+4. Open the URL provided by Vite (usually `http://localhost:4173` or similar).
+5. You should now see an "Install" icon in your browser's address bar.
+6. **Testing Offline**: Once loaded, you can disconnect your internet or toggle "Offline" in the browser DevTools Network tab. The app will still load, and previously opened receipt files will be served from the service worker cache!
+
+---
+
 ## 🛡️ Security Notes
 
 - **Data at Rest**: Extracted data is stored in Firestore as an encrypted string. It is only decrypted by the backend when requested by the Review Queue or Ledger pages.
 - **Credentials**: Never commit `.env` files or `serviceAccountKey.json` to version control.
+
