@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import { useSearchParams } from 'react-router-dom';
 import { db } from '../firebase';
@@ -11,6 +11,9 @@ export default function Ledger() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState('All');
+  const [activeMenuId, setActiveMenuId] = useState(null);
+  const [editingTx, setEditingTx] = useState(null);
+  const [deletingTx, setDeletingTx] = useState(null);
   const categories = ['All', 'Food & Dining', 'Travel', 'Software & SaaS', 'Office Supplies', 'Utilities', 'Marketing'];
 
   const [decryptedMap, setDecryptedMap] = useState({});
@@ -48,6 +51,73 @@ export default function Ledger() {
     });
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.kebab-menu-button') && !event.target.closest('.dropdown-menu')) {
+        setActiveMenuId(null);
+      }
+    };
+
+    if (activeMenuId) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activeMenuId]);
+
+  const handleViewReceipt = (tx) => {
+    const url = tx.ocrResults?.[0]?.fileUrl;
+    if (url) window.open(url, '_blank');
+    else toast.error("No file URL available");
+    setActiveMenuId(null);
+  };
+
+  const handleDownload = async (tx) => {
+    const url = tx.ocrResults?.[0]?.fileUrl;
+    if (url) {
+      try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = tx.ocrResults?.[0]?.filename || 'receipt.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+      } catch (err) {
+        toast.error("Failed to download file");
+        window.open(url, '_blank');
+      }
+    } else {
+      toast.error("No file URL available");
+    }
+    setActiveMenuId(null);
+  };
+
+  const handleMoveToReview = async (tx) => {
+    try {
+      await updateDoc(doc(db, 'inbox', tx.id), { status: 'needs_review' });
+      toast.success("Moved back to Review Queue");
+    } catch (err) {
+      toast.error("Failed to move item");
+    }
+    setActiveMenuId(null);
+  };
+
+  const handleDelete = async (tx) => {
+    try {
+      await deleteDoc(doc(db, 'inbox', tx.id));
+      toast.success("Transaction deleted");
+    } catch (err) {
+      toast.error("Failed to delete");
+    }
+    setActiveMenuId(null);
+    setDeletingTx(null);
+  };
 
   const filteredTransactions = transactions.filter(t => {
     const data = decryptedMap[t.id] || t.ocrResults?.[0]?.data || {};
@@ -190,7 +260,7 @@ export default function Ledger() {
                 <tr><td colSpan="7" className="px-md py-xl text-center text-on-surface-variant">Loading transactions...</td></tr>
               ) : filteredTransactions.length === 0 ? (
                 <tr><td colSpan="7" className="px-md py-xl text-center text-on-surface-variant">No transactions found.</td></tr>
-              ) : filteredTransactions.map((tx) => {
+              ) : filteredTransactions.map((tx, index) => {
                 const data = tx.ocrResults?.[0]?.data || {};
                 const date = data.date || tx.receivedAt?.toDate()?.toLocaleDateString() || 'N/A';
                 return (
@@ -226,8 +296,38 @@ export default function Ledger() {
                         Approved
                       </span>
                     </td>
-                    <td className="px-md py-md text-right">
-                      <span className="material-symbols-outlined text-on-surface-variant cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">more_vert</span>
+                    <td className="px-md py-md text-right relative">
+                      <button 
+                        onClick={() => setActiveMenuId(activeMenuId === tx.id ? null : tx.id)}
+                        className="material-symbols-outlined text-on-surface-variant cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity p-xs hover:bg-surface-container rounded-full kebab-menu-button"
+                      >
+                        more_vert
+                      </button>
+                      {activeMenuId === tx.id && (
+                        <div className={`absolute right-md w-48 bg-surface border border-outline-variant rounded-lg shadow-lg z-20 py-1 text-left dropdown-menu ${index >= filteredTransactions.length - 2 && filteredTransactions.length > 3 ? 'bottom-full mb-1' : 'top-full mt-1'}`}>
+                          <button onClick={() => handleViewReceipt(tx)} className="w-full text-left px-md py-sm hover:bg-surface-container flex items-center gap-sm text-body-sm text-on-surface">
+                            <span className="material-symbols-outlined text-[18px]">visibility</span>
+                            View Receipt
+                          </button>
+                          <button onClick={() => setEditingTx(tx)} className="w-full text-left px-md py-sm hover:bg-surface-container flex items-center gap-sm text-body-sm text-on-surface">
+                            <span className="material-symbols-outlined text-[18px]">edit</span>
+                            Edit Transaction
+                          </button>
+                          <button onClick={() => handleDownload(tx)} className="w-full text-left px-md py-sm hover:bg-surface-container flex items-center gap-sm text-body-sm text-on-surface">
+                            <span className="material-symbols-outlined text-[18px]">download</span>
+                            Download File
+                          </button>
+                          <button onClick={() => handleMoveToReview(tx)} className="w-full text-left px-md py-sm hover:bg-surface-container flex items-center gap-sm text-body-sm text-on-surface">
+                            <span className="material-symbols-outlined text-[18px]">assignment_return</span>
+                            Move to Review
+                          </button>
+                          <div className="border-t border-outline-variant my-1"></div>
+                          <button onClick={() => { setDeletingTx(tx); setActiveMenuId(null); }} className="w-full text-left px-md py-sm hover:bg-surface-container flex items-center gap-sm text-body-sm text-error">
+                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                            Delete
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 );
@@ -291,6 +391,118 @@ export default function Ledger() {
           <div className="absolute right-0 top-0 h-full w-1/2 bg-gradient-to-l from-on-primary-container/10 to-transparent pointer-events-none"></div>
         </div>
       </div>
+      {/* Edit Modal */}
+      {editingTx && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-surface p-xl rounded-xl border border-outline-variant w-full max-w-md shadow-lg">
+            <h3 className="font-headline-sm text-headline-sm text-on-surface mb-md">Edit Transaction</h3>
+            <div className="flex flex-col gap-md">
+              <div>
+                <label className="font-label-caps text-label-caps text-on-surface-variant mb-xs block">Vendor</label>
+                <input 
+                  id="edit-vendor"
+                  type="text" 
+                  defaultValue={decryptedMap[editingTx.id]?.vendor || editingTx.ocrResults?.[0]?.data?.vendor || ''} 
+                  className="w-full px-md py-sm bg-surface-container border border-outline-variant rounded-lg text-on-surface"
+                />
+              </div>
+              <div>
+                <label className="font-label-caps text-label-caps text-on-surface-variant mb-xs block">Amount ($)</label>
+                <input 
+                  id="edit-amount"
+                  type="number" 
+                  defaultValue={decryptedMap[editingTx.id]?.amount || editingTx.ocrResults?.[0]?.data?.amount || ''} 
+                  className="w-full px-md py-sm bg-surface-container border border-outline-variant rounded-lg text-on-surface"
+                />
+              </div>
+              <div>
+                <label className="font-label-caps text-label-caps text-on-surface-variant mb-xs block">Category</label>
+                <select 
+                  id="edit-category"
+                  defaultValue={decryptedMap[editingTx.id]?.category || editingTx.ocrResults?.[0]?.data?.category || 'Uncategorized'} 
+                  className="w-full px-md py-sm bg-surface-container border border-outline-variant rounded-lg text-on-surface"
+                >
+                  {categories.filter(c => c !== 'All').map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                  <option value="Uncategorized">Uncategorized</option>
+                </select>
+              </div>
+              <div>
+                <label className="font-label-caps text-label-caps text-on-surface-variant mb-xs block">Date</label>
+                <input 
+                  id="edit-date"
+                  type="date" 
+                  defaultValue={decryptedMap[editingTx.id]?.date || editingTx.ocrResults?.[0]?.data?.date || ''} 
+                  className="w-full px-md py-sm bg-surface-container border border-outline-variant rounded-lg text-on-surface"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-sm mt-xl">
+              <button 
+                onClick={() => setEditingTx(null)} 
+                className="px-md py-sm border border-outline-variant rounded-lg font-body-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={async () => {
+                  const vendor = document.getElementById('edit-vendor').value;
+                  const amount = parseFloat(document.getElementById('edit-amount').value);
+                  const category = document.getElementById('edit-category').value;
+                  const date = document.getElementById('edit-date').value;
+                  
+                  try {
+                    const updatedOcrResults = [...(editingTx.ocrResults || [])];
+                    if (updatedOcrResults[0]) {
+                      updatedOcrResults[0].data = {
+                        ...updatedOcrResults[0].data,
+                        vendor,
+                        amount,
+                        category,
+                        date
+                      };
+                    }
+                    await updateDoc(doc(db, 'inbox', editingTx.id), {
+                      ocrResults: updatedOcrResults
+                    });
+                    toast.success("Transaction updated!");
+                    setEditingTx(null);
+                  } catch (err) {
+                    toast.error("Failed to update transaction");
+                  }
+                }} 
+                className="px-md py-sm bg-primary text-on-primary rounded-lg font-body-sm font-semibold hover:opacity-90 transition-opacity"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Delete Confirmation Modal */}
+      {deletingTx && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-surface p-xl rounded-xl border border-outline-variant w-full max-w-md shadow-lg">
+            <h3 className="font-headline-sm text-headline-sm text-on-surface mb-xs">Delete Transaction</h3>
+            <p className="font-body-md text-on-surface-variant mb-lg">Are you sure you want to delete this transaction? This action cannot be undone.</p>
+            <div className="flex justify-end gap-sm">
+              <button 
+                onClick={() => setDeletingTx(null)} 
+                className="px-md py-sm border border-outline-variant rounded-lg font-body-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => handleDelete(deletingTx)} 
+                className="px-md py-sm bg-error text-on-error rounded-lg font-body-sm font-semibold hover:opacity-90 transition-opacity"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

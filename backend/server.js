@@ -40,10 +40,12 @@ function decryptFernet(token) {
   }
 }
 
+// Middleware
+app.use(cors());
+
 // Serve uploads folder statically so frontend can display images
 app.use('/uploads', express.static('uploads'));
 
-// Middleware
 // We need raw body for Stripe webhooks to verify signatures
 app.use((req, res, next) => {
   if (req.originalUrl === '/api/webhooks/stripe') {
@@ -52,7 +54,6 @@ app.use((req, res, next) => {
     express.json()(req, res, next);
   }
 });
-app.use(cors());
 
 // Configure multer for parsing multipart/form-data (email attachments)
 const storage = multer.diskStorage({
