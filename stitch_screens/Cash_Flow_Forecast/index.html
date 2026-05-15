@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FinPilot - Cash Flow Forecast</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "secondary-fixed": "#dae2fd",
+                        "surface-tint": "#005ac2",
+                        "primary": "#0058be",
+                        "primary-fixed": "#d8e2ff",
+                        "error-container": "#ffdad6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#fdfcff",
+                        "surface-container-low": "#f2f4f6",
+                        "on-surface": "#191c1e",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-secondary-fixed": "#131b2e",
+                        "on-primary-fixed": "#001a42",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#eff1f3",
+                        "secondary-container": "#dae2fd",
+                        "secondary": "#565e74",
+                        "on-secondary-container": "#5c647a",
+                        "tertiary-fixed": "#d3e4fe",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "on-primary": "#ffffff",
+                        "surface": "#f7f9fb",
+                        "outline-variant": "#c2c6d6",
+                        "tertiary": "#4d5d73",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "surface-variant": "#e0e3e5",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "surface-dim": "#d8dadc",
+                        "on-tertiary": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "on-surface-variant": "#424754",
+                        "surface-container": "#eceef0",
+                        "outline": "#727785",
+                        "on-error-container": "#93000a",
+                        "on-background": "#191c1e",
+                        "primary-container": "#2170e4",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "background": "#f7f9fb",
+                        "surface-container-high": "#e6e8ea",
+                        "on-secondary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "on-primary-container": "#fefcff",
+                        "inverse-primary": "#adc6ff",
+                        "tertiary-container": "#66768d",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-primary-fixed-variant": "#004395"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "xl": "40px",
+                        "margin-mobile": "16px",
+                        "lg": "24px",
+                        "margin-desktop": "32px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "base": "4px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "data-mono": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["30px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .chart-container {
+            background-image: linear-gradient(to bottom, transparent 95%, rgba(114, 119, 133, 0.1) 95%),
+                              linear-gradient(to right, transparent 95%, rgba(114, 119, 133, 0.1) 95%);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-screen flex flex-col p-md bg-surface h-full w-64 border-r border-outline-variant z-50">
+<div class="mb-xl px-sm">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-surface">FinPilot</h1>
+<p class="text-[10px] uppercase tracking-widest text-outline">AI Financial Partner</p>
+</div>
+</div>
+</div>
+<nav class="flex-grow space-y-xs">
+<!-- Active State: Overview (Forecast is a top-level overview) -->
+<a class="flex items-center gap-md p-sm text-primary font-bold bg-secondary-container rounded-lg cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Overview</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="fact_check">fact_check</span>
+<span class="font-body-md text-body-md">Review Queue</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="font-body-md text-body-md">Ledger</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Integrations</span>
+</a>
+</nav>
+<button class="mt-xl bg-primary text-on-primary py-sm px-md rounded-lg font-bold flex items-center justify-center gap-sm hover:brightness-110 transition-all">
+<span class="material-symbols-outlined">add</span>
+            New Extraction
+        </button>
+<div class="mt-auto space-y-xs pt-md border-t border-outline-variant">
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-body-md text-body-md">Support</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-body-md text-body-md">Account</span>
+</a>
+</div>
+</aside>
+<!-- TopNavBar Shell -->
+<header class="flex justify-between items-center h-16 px-margin-desktop sticky top-0 z-40 bg-surface ml-64 border-b border-outline-variant">
+<div class="flex items-center gap-md w-1/3">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-xl pr-md py-xs bg-surface-container-low border-none rounded-lg text-body-sm focus:ring-1 focus:ring-primary" placeholder="Search transactions, scenarios, or help..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-sm">
+<img alt="User profile" class="w-8 h-8 rounded-full bg-surface-container-highest" data-alt="A professional headshot of a modern financial executive with a clean, blurred office background. The lighting is soft and neutral, reflecting a corporate modernism aesthetic with high precision and technological edge." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0cI4bKa4vQg6YMkMlEUNd_uAP5_unGsGjzecmuLC31S1ge7XZ3Uefj9pDk7FkOiylWT56BYcfXZ5x0DCG4c52-RnkE89aIvlPw72zYKAwzU4UANEPxfHHeaZmhKEfcfL0LiDn0VGfnjxNaLONn5rg0-8AH1fd_n6hV4oNwce4WQaq4JMfUIpipeLHN-s6kzbqO3LPmeLIax2Kl0KLv5XOVvgfEQ7m3XaI3hZ75VewEFyCKjaKQs6TLAc2wRKvWiL_RJ63-ZqnU3g"/>
+<div class="flex flex-col">
+<span class="font-body-sm font-bold leading-none">Alex Rivera</span>
+<span class="text-[10px] text-outline">Owner</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-margin-desktop min-h-screen max-w-[1280px]">
+<!-- Header Section -->
+<section class="flex justify-between items-end mb-lg">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Cash Flow Forecast</h2>
+<p class="font-body-md text-on-surface-variant">Phase 3 MVP • Analysis based on 24 months of historical ledger data.</p>
+</div>
+<div class="flex gap-sm">
+<div class="flex bg-surface-container p-[2px] rounded-lg border border-outline-variant">
+<button class="px-md py-1 bg-surface rounded-md shadow-sm font-body-sm font-bold">Monthly</button>
+<button class="px-md py-1 text-on-surface-variant font-body-sm hover:text-on-surface">Quarterly</button>
+</div>
+<button class="flex items-center gap-sm border border-outline-variant px-md py-xs rounded-lg font-body-sm font-bold hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                    Export PDF
+                </button>
+</div>
+</section>
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Key Metrics Grid -->
+<div class="col-span-12 grid grid-cols-3 gap-gutter mb-sm">
+<!-- Estimated Balance -->
+<div class="bg-surface border border-outline-variant p-md rounded-xl flex flex-col justify-between">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-xs">Estimated Balance (Next 30 Days)</p>
+<h3 class="font-headline-sm text-headline-sm font-bold">$142,500.00</h3>
+</div>
+<div class="mt-md flex items-center gap-xs text-primary font-bold text-body-sm">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>+12.4% from current</span>
+</div>
+</div>
+<!-- Predicted Burn Rate -->
+<div class="bg-surface border border-outline-variant p-md rounded-xl flex flex-col justify-between">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-xs">Predicted Burn Rate</p>
+<h3 class="font-headline-sm text-headline-sm font-bold">$18,240.00 <span class="text-body-sm font-normal text-on-surface-variant">/mo</span></h3>
+</div>
+<div class="mt-md flex items-center gap-xs text-error font-bold text-body-sm">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>Burn increased by 4%</span>
+</div>
+</div>
+<!-- Safe to Spend -->
+<div class="bg-primary-container text-on-primary-container p-md rounded-xl flex flex-col justify-between border border-primary">
+<div>
+<p class="font-label-caps text-label-caps opacity-80 uppercase mb-xs text-on-primary-container">Safe to Spend</p>
+<h3 class="font-headline-sm text-headline-sm font-bold">$64,800.00</h3>
+</div>
+<div class="mt-md flex items-center gap-xs text-on-primary-container font-medium text-body-sm">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span>98% Confidence Interval</span>
+</div>
+</div>
+</div>
+<!-- Forecast Chart Area -->
+<div class="col-span-12 lg:col-span-8 space-y-gutter">
+<div class="bg-surface border border-outline-variant rounded-xl p-lg relative overflow-hidden h-[450px]">
+<div class="flex justify-between items-start mb-lg">
+<div>
+<h4 class="font-body-lg font-bold">Liquidity Projection</h4>
+<p class="text-body-sm text-on-surface-variant">Historical spend (Solid) vs. Predicted future (Dashed)</p>
+</div>
+<div class="flex gap-md">
+<div class="flex items-center gap-xs">
+<div class="w-3 h-3 bg-primary rounded-full"></div>
+<span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Historical</span>
+</div>
+<div class="flex items-center gap-xs">
+<div class="w-3 h-[2px] bg-primary border-t-2 border-dashed border-primary"></div>
+<span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">Predicted</span>
+</div>
+</div>
+</div>
+<!-- Simplified SVG Chart for Visualization -->
+<div class="chart-container absolute inset-x-lg bottom-xl top-32 flex flex-col justify-end">
+<svg class="w-full h-full" viewbox="0 0 800 240">
+<!-- Historical Path -->
+<path d="M0,200 L100,180 L200,190 L300,150 L400,170" fill="none" stroke="#0058be" stroke-linecap="round" stroke-width="3"></path>
+<!-- Predicted Path (Dashed) -->
+<path d="M400,170 L500,140 L600,110 L700,90 L800,75" fill="none" stroke="#0058be" stroke-dasharray="8,4" stroke-linecap="round" stroke-width="3"></path>
+<!-- Hover Marker -->
+<circle cx="400" cy="170" fill="#0058be" r="6" stroke="white" stroke-width="2"></circle>
+<!-- Baseline -->
+<line stroke="#E2E8F0" stroke-width="1" x1="0" x2="800" y1="240" y2="240"></line>
+</svg>
+<!-- Labels -->
+<div class="flex justify-between mt-md text-[11px] font-bold text-outline uppercase">
+<span>Jan</span>
+<span>Feb</span>
+<span>Mar</span>
+<span>Apr (Today)</span>
+<span>May</span>
+<span>Jun</span>
+<span>Jul</span>
+</div>
+</div>
+</div>
+<!-- Analysis Summary -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl p-md flex items-start gap-md">
+<div class="bg-primary-container text-on-primary-container p-xs rounded">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<div>
+<h5 class="text-body-md font-bold text-on-surface">FinPilot AI Insights</h5>
+<p class="text-body-sm text-on-surface-variant mt-xs">Based on current velocity, you will reach your 6-month runway target by August 12. SaaS spend is trending 12% higher than Q1. Recommendation: Review "Cloud Infrastructure" recurring charges.</p>
+</div>
+</div>
+</div>
+<!-- Scenario Planner Sidebar -->
+<div class="col-span-12 lg:col-span-4">
+<div class="bg-surface border border-outline-variant rounded-xl flex flex-col h-full sticky top-20">
+<div class="p-md border-b border-outline-variant flex items-center justify-between">
+<h4 class="font-body-lg font-bold">Scenario Planner</h4>
+<span class="material-symbols-outlined text-outline text-[20px]">info</span>
+</div>
+<div class="p-md space-y-md flex-grow">
+<p class="text-body-sm text-on-surface-variant mb-md">Toggle "What-if" variables to see impact on your 3-month forecast.</p>
+<!-- Scenario Toggle 1 -->
+<div class="group p-sm border border-outline-variant rounded-lg hover:border-primary transition-colors cursor-pointer">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">person_add</span>
+<span class="font-body-md font-bold">Add New Employee</span>
+</div>
+<div class="w-10 h-5 bg-surface-container-highest rounded-full relative">
+<div class="absolute left-[2px] top-[2px] w-4 h-4 bg-white rounded-full shadow-sm"></div>
+</div>
+</div>
+<div class="flex justify-between text-body-sm">
+<span class="text-on-surface-variant">Est. Impact:</span>
+<span class="text-error font-medium">-$8,500/mo</span>
+</div>
+</div>
+<!-- Scenario Toggle 2 -->
+<div class="group p-sm border border-primary bg-primary-fixed rounded-lg cursor-pointer">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-primary-fixed">cloud_off</span>
+<span class="font-body-md font-bold text-on-primary-fixed">Cut SaaS Spend</span>
+</div>
+<div class="w-10 h-5 bg-primary rounded-full relative">
+<div class="absolute right-[2px] top-[2px] w-4 h-4 bg-white rounded-full shadow-sm"></div>
+</div>
+</div>
+<div class="flex justify-between text-body-sm">
+<span class="text-on-primary-fixed-variant">Est. Impact:</span>
+<span class="text-primary font-bold">+$1,200/mo</span>
+</div>
+</div>
+<!-- Scenario Toggle 3 -->
+<div class="group p-sm border border-outline-variant rounded-lg hover:border-primary transition-colors cursor-pointer opacity-70">
+<div class="flex justify-between items-start mb-sm">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant">campaign</span>
+<span class="font-body-md font-bold">Increase Ad Budget</span>
+</div>
+<div class="w-10 h-5 bg-surface-container-highest rounded-full relative">
+<div class="absolute left-[2px] top-[2px] w-4 h-4 bg-white rounded-full shadow-sm"></div>
+</div>
+</div>
+<div class="flex justify-between text-body-sm">
+<span class="text-on-surface-variant">Est. Impact:</span>
+<span class="text-error font-medium">-$3,000/mo</span>
+</div>
+</div>
+</div>
+<div class="p-md border-t border-outline-variant bg-surface-container-lowest">
+<div class="flex justify-between mb-sm">
+<span class="text-body-sm font-bold">Scenario Result:</span>
+<span class="text-body-sm text-primary font-bold">+$3,600 (Q3)</span>
+</div>
+<button class="w-full py-sm bg-surface-variant text-on-surface font-bold rounded-lg border border-outline-variant hover:bg-surface-container transition-all">
+                            Reset All
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Details Grid (High Density) -->
+<section class="mt-xl">
+<h4 class="font-label-caps text-label-caps text-outline uppercase mb-md">Forecast Breakdown by Category</h4>
+<div class="bg-surface border border-outline-variant rounded-xl overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low">
+<tr>
+<th class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant">Category</th>
+<th class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant text-right">Avg. Historical</th>
+<th class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant text-right">May (P)</th>
+<th class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant text-right">Jun (P)</th>
+<th class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant text-right">Jul (P)</th>
+<th class="px-md py-sm font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant text-center">Status</th>
+</tr>
+</thead>
+<tbody class="text-body-sm">
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-md py-sm border-b border-outline-variant font-medium">Payroll &amp; Benefits</td>
+<td class="px-md py-sm border-b border-outline-variant text-right font-data-mono">$45,000</td>
+<td class="px-md py-sm border-b border-outline-variant text-right font-data-mono">$45,000</td>
+<td class="px-md py-sm border-b border-outline-variant text-right font-data-mono text-error">$53,500</td>
+<td class="px-md py-sm border-b border-outline-variant text-right font-data-mono">$53,500</td>
+<td class="px-md py-sm border-b border-outline-variant text-center">
+<span class="bg-secondary-container text-on-secondary-container px-xs py-[2px] rounded text-[10px] font-bold uppercase tracking-tighter">Synced</span>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-md py-sm border-b border-outline-variant font-medium">Software &amp; Subscriptions</td>
+<td class="px-md py-sm border-b border-outline-variant text-right font-data-mono">$3,200</td>
+<td class="px-md py-sm border-b border-outline-variant text-right font-data-mono">$3,450</td>
+<td class="px-md py-sm border-b border-outline-variant text-right font-data-mono text-primary">$2,250</td>
+<td class="px-md py-sm border-b border-outline-variant text-right font-data-mono">$2,250</td>
+<td class="px-md py-sm border-b border-outline-variant text-center">
+<span class="bg-[#dcfce7] text-[#166534] px-xs py-[2px] rounded text-[10px] font-bold uppercase tracking-tighter">Optimized</span>
+</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="px-md py-sm border-b border-outline-variant font-medium">Marketing &amp; Sales</td>
+<td class="px-md py-sm border-b border-outline-variant text-right font-data-mono">$8,000</td>
+<td class="px-md py-sm border-b border-outline-variant text-right font-data-mono">$8,000</td>
+<td class="px-md py-sm border-b border-outline-variant text-right font-data-mono">$8,000</td>
+<td class="px-md py-sm border-b border-outline-variant text-right font-data-mono">$8,000</td>
+<td class="px-md py-sm border-b border-outline-variant text-center">
+<span class="bg-surface-container-highest text-on-surface-variant px-xs py-[2px] rounded text-[10px] font-bold uppercase tracking-tighter">Stable</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+</body></html>

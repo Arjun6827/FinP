@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#131b2e",
+                        "on-primary-container": "#fefcff",
+                        "surface-container-highest": "#e0e3e5",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e0e3e5",
+                        "primary-container": "#2170e4",
+                        "on-tertiary-container": "#fdfcff",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#adc6ff",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "on-surface": "#191c1e",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#5c647a",
+                        "secondary-container": "#dae2fd",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "surface-container-low": "#f2f4f6",
+                        "tertiary-container": "#66768d",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary": "#0058be",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "on-primary-fixed-variant": "#004395",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-primary-fixed": "#001a42",
+                        "surface-container-high": "#e6e8ea",
+                        "outline-variant": "#c2c6d6",
+                        "secondary-fixed": "#dae2fd",
+                        "secondary": "#565e74",
+                        "surface": "#f7f9fb",
+                        "primary-fixed": "#d8e2ff",
+                        "tertiary-fixed": "#d3e4fe",
+                        "tertiary": "#4d5d73",
+                        "surface-tint": "#005ac2",
+                        "on-surface-variant": "#424754",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#191c1e",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "outline": "#727785",
+                        "surface-container": "#eceef0",
+                        "background": "#f7f9fb",
+                        "surface-bright": "#f7f9fb",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2d3133"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "32px",
+                        "xl": "40px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "base": "4px",
+                        "md": "16px",
+                        "gutter": "16px",
+                        "lg": "24px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "data-mono": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "data-mono": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen flex flex-col p-md h-full w-64 border-r border-outline-variant bg-surface dark:bg-inverse-surface z-50">
+<div class="flex items-center gap-sm mb-xl">
+<div class="w-10 h-10 rounded bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-surface dark:text-inverse-on-surface">FinPilot</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">AI Financial Partner</p>
+</div>
+</div>
+<nav class="flex-1 space-y-xs">
+<div class="flex items-center gap-sm p-sm cursor-pointer duration-200 hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors rounded-lg text-on-surface-variant dark:text-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Overview</span>
+</div>
+<div class="flex items-center gap-sm p-sm cursor-pointer duration-200 hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors rounded-lg text-on-surface-variant dark:text-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">fact_check</span>
+<span class="font-body-md text-body-md">Review Queue</span>
+</div>
+<div class="flex items-center gap-sm p-sm cursor-pointer duration-200 hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors rounded-lg text-on-surface-variant dark:text-surface-variant hover:text-on-surface">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-body-md text-body-md">Ledger</span>
+</div>
+<!-- Active Tab: Integrations -->
+<div class="flex items-center gap-sm p-sm cursor-pointer duration-200 text-primary dark:text-inverse-primary font-bold bg-secondary-container dark:bg-on-secondary-fixed-variant rounded-lg">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Integrations</span>
+</div>
+</nav>
+<button class="mb-lg w-full py-sm bg-primary text-on-primary rounded-lg font-body-md font-bold hover:bg-primary-container transition-colors">
+            New Extraction
+        </button>
+<div class="border-t border-outline-variant pt-md space-y-xs">
+<div class="flex items-center gap-sm p-sm cursor-pointer duration-200 hover:bg-surface-container-low transition-colors rounded-lg text-on-surface-variant">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body-md text-body-md">Support</span>
+</div>
+<div class="flex items-center gap-sm p-sm cursor-pointer duration-200 hover:bg-surface-container-low transition-colors rounded-lg text-on-surface-variant">
+<span class="material-symbols-outlined">person</span>
+<span class="font-body-md text-body-md">Account</span>
+</div>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="flex justify-between items-center h-16 px-margin-desktop sticky top-0 z-40 bg-surface dark:bg-inverse-surface ml-64 border-b border-outline-variant">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-xl pr-md py-xs bg-surface-container-low border border-outline-variant rounded-lg text-body-sm focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Search data sources..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-xs text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-xs text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A professional headshot of a financial tech executive against a neutral, high-key studio background. The lighting is soft and directional, emphasizing clarity and confidence. The aesthetic is modern and corporate, reflecting the premium nature of a professional AI-driven financial platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAETqaYHL0opVcpUM-Of8J2839BgUFnyXiR_LsmIRBXufqqWxxYUfxQvTXf9PS74AkKk84gOScuBw8efFHUeH6Ljw7Q5217ZAhAcTeB1vdGKxDB4oavHu4Dfutb1_I_CMyg-BjH8w0arwPxamz8wmcG6oPPVw_imuTpIyC9_ITZcWJANWLgEh8yiJfGvlYTuw3cc-d6zeOahxjDdB-HuM2wEXDOLMIrQ-D9D8_ZEvCjD_OjooZULzgE4xJ-9EQneqFHCOHT5oilwA4"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 p-margin-desktop min-h-screen">
+<div class="max-w-[1280px] mx-auto">
+<div class="mb-xl">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-xs">Integration Settings</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Configure and manage your data ingestion channels to automate your financial workflows.</p>
+</div>
+<!-- Bento-style Grid for Integrations -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Card 1: Email (Gmail/Outlook) -->
+<div class="md:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col justify-between">
+<div>
+<div class="flex items-start justify-between mb-md">
+<div class="flex items-center gap-md">
+<div class="w-14 h-14 rounded-lg bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[32px]">mail</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Email Ingestion</h3>
+<span class="font-label-caps text-label-caps text-on-surface-variant bg-surface-container px-sm py-1 rounded">GMAIL &amp; OUTLOOK</span>
+</div>
+</div>
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full bg-white border border-outline-variant flex items-center justify-center">
+<img alt="Gmail" class="w-4 h-4" data-alt="The official multi-colored Google logo centered on a clean white circular icon with a subtle 1px gray border. The visual style is crisp, high-resolution, and perfectly centered, symbolizing seamless integration with Google Workspace services." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAffd1z0TcCf9Ko0qmGXSK4K9jvpFuomuXXflydf9Y8LNxi1blEL4xnzkwAaoF02_qKWwB31Y1CXryvoJNXQ8wFtH3tMpLbSfcefJoQjLniLJeSQOIgngfK7xw1FMXTZ9ABYS0SZdfecnVTVY2TDqvnUnmMjjutW3i8JZVs_Fuk_ZZW8QK6eHJcra80-F_GIfq12DGxztwh3LOKFvcaoMpCqDtxp4TRAWLdmOvlyNodeaVKJLtk0qzqdY8JoHGEkG-ZTMtBeWzsRD8"/>
+</div>
+<div class="w-8 h-8 rounded-full bg-white border border-outline-variant flex items-center justify-center">
+<img alt="Outlook" class="w-4 h-4" data-alt="The official blue and white Microsoft Outlook logo, rendered as a high-fidelity vector icon on a clean white circular background. The lighting is flat and modern, aligning with corporate software aesthetic and professional integration standards." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQhgIWjezgX4ralb7Ly_mVs3tAf1UEy8GDiApFDmEHg2n6f0k1FtwSfFqyYcmEieEHDCMfIZHDSjT0gCH5RH2pQN45z_QNdwsGYkk_C_R0YOY9p-2B9ZrucNjjPUC3jmSeBW_lXZKNXOQsf50SI4TOJM7b_Oy4QmqJKHYcyW5x7WjDYE_6g06jbJ6-6ExY-80Rubpbu_swtbp_gdpaEnMBkpefUCoIQYYW-ezrxfcHmfpH39NA9yVE8RZxD2F9hH44uJzhe8ZnIUs"/>
+</div>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg max-w-2xl">
+                            Automatically forward invoices, receipts, and financial statements directly to FinPilot. Our AI extracts transaction data with 99.9% accuracy.
+                        </p>
+</div>
+<div class="flex items-center justify-between border-t border-outline-variant pt-lg">
+<div class="flex gap-xl">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-xs">STATUS</p>
+<div class="flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-outline"></div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Disconnected</span>
+</div>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-xs">LAST SYNC</p>
+<span class="font-body-sm text-body-sm text-on-surface-variant">—</span>
+</div>
+</div>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-body-md font-bold hover:bg-primary-container transition-all">
+                            Connect
+                        </button>
+</div>
+</div>
+<!-- Card 2: Mobile Sync (Enabled) -->
+<div class="md:col-span-4 bg-primary text-on-primary rounded-xl p-lg flex flex-col relative overflow-hidden">
+<div class="relative z-10 flex flex-col h-full">
+<div class="flex items-center justify-between mb-md">
+<div class="w-12 h-12 rounded-lg bg-on-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">smartphone</span>
+</div>
+<span class="bg-white/20 px-sm py-1 rounded-full font-label-caps text-label-caps text-on-primary">ACTIVE</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm mb-sm">Mobile Sync</h3>
+<p class="font-body-sm text-body-sm text-on-primary/80 mb-lg">
+                            Real-time transaction capture via the FinPilot mobile app. Receipt scanning enabled.
+                        </p>
+<div class="mt-auto pt-lg border-t border-white/20">
+<button class="w-full py-sm bg-white text-primary rounded-lg font-body-md font-bold hover:bg-white/90 transition-colors">
+                                View Devices
+                            </button>
+</div>
+</div>
+<!-- Abstract Decorative Background -->
+<div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+</div>
+<!-- Card 3: Webhooks (Stripe/PayPal) -->
+<div class="md:col-span-12 bg-surface-container-low border border-outline-variant rounded-xl p-lg">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-lg">
+<div class="flex items-center gap-lg">
+<div class="w-14 h-14 rounded-lg bg-tertiary-container flex items-center justify-center text-on-tertiary-container">
+<span class="material-symbols-outlined text-[32px]">webhook</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Payment Webhooks</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Stripe, PayPal, and Square direct processing</p>
+</div>
+</div>
+<div class="flex items-center gap-xl">
+<div class="text-right hidden sm:block">
+<p class="font-label-caps text-label-caps text-on-surface-variant">ACTIVE ENDPOINTS</p>
+<p class="font-data-mono text-data-mono text-primary">03 Active</p>
+</div>
+<a class="flex items-center gap-xs font-body-md font-bold text-primary hover:underline group" href="#">
+                                Manage
+                                <span class="material-symbols-outlined text-body-md group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Sub-grid for specific webhooks -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-md mt-lg pt-lg border-t border-outline-variant">
+<div class="flex items-center gap-sm p-sm bg-surface-container-lowest rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant">payments</span>
+<div class="flex-1">
+<p class="font-body-sm font-bold text-on-surface">Stripe</p>
+<p class="font-label-caps text-[10px] text-primary">SYNCED 2M AGO</p>
+</div>
+<div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+</div>
+<div class="flex items-center gap-sm p-sm bg-surface-container-lowest rounded-lg border border-outline-variant opacity-60">
+<span class="material-symbols-outlined text-on-surface-variant">account_balance</span>
+<div class="flex-1">
+<p class="font-body-sm font-bold text-on-surface">PayPal</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant">INACTIVE</p>
+</div>
+<div class="w-2 h-2 rounded-full bg-outline"></div>
+</div>
+<div class="flex items-center gap-sm p-sm bg-surface-container-lowest rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant">point_of_sale</span>
+<div class="flex-1">
+<p class="font-body-sm font-bold text-on-surface">Square</p>
+<p class="font-label-caps text-[10px] text-primary">SYNCED 1H AGO</p>
+</div>
+<div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+</div>
+</div>
+</div>
+<!-- Footer CTA/Info Section -->
+<div class="md:col-span-12 flex items-center gap-md bg-secondary-container/30 border border-secondary-container rounded-lg p-md mt-lg">
+<span class="material-symbols-outlined text-primary">info</span>
+<p class="font-body-sm text-body-sm text-on-secondary-container flex-1">
+                        Looking for a specific provider? FinPilot supports over 200+ financial integrations. <a class="text-primary font-bold hover:underline" href="#">Request a new integration</a>
+</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual FAB Suppression: Hiding as per rules for Settings page -->
+</body></html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#131b2e",
+                        "on-primary-container": "#fefcff",
+                        "surface-container-highest": "#e0e3e5",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e0e3e5",
+                        "primary-container": "#2170e4",
+                        "on-tertiary-container": "#fdfcff",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#adc6ff",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "on-surface": "#191c1e",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#5c647a",
+                        "secondary-container": "#dae2fd",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "surface-container-low": "#f2f4f6",
+                        "tertiary-container": "#66768d",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary": "#0058be",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "on-primary-fixed-variant": "#004395",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-primary-fixed": "#001a42",
+                        "surface-container-high": "#e6e8ea",
+                        "outline-variant": "#c2c6d6",
+                        "secondary-fixed": "#dae2fd",
+                        "secondary": "#565e74",
+                        "surface": "#f7f9fb",
+                        "primary-fixed": "#d8e2ff",
+                        "tertiary-fixed": "#d3e4fe",
+                        "tertiary": "#4d5d73",
+                        "surface-tint": "#005ac2",
+                        "on-surface-variant": "#424754",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#191c1e",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "outline": "#727785",
+                        "surface-container": "#eceef0",
+                        "background": "#f7f9fb",
+                        "surface-bright": "#f7f9fb",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2d3133"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "32px",
+                        "xl": "40px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "base": "4px",
+                        "md": "16px",
+                        "gutter": "16px",
+                        "lg": "24px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "data-mono": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["30px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen flex flex-col p-md h-full w-64 border-r border-outline-variant bg-surface dark:bg-inverse-surface z-50">
+<div class="flex items-center gap-sm mb-xl">
+<div class="w-8 h-8 bg-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-on-surface dark:text-inverse-on-surface">FinPilot</h1>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant">AI Financial Partner</p>
+</div>
+</div>
+<nav class="flex-1 space-y-xs">
+<a class="flex items-center gap-md p-sm text-on-surface-variant dark:text-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors cursor-pointer duration-200 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Overview</span>
+</a>
+<a class="flex items-center gap-md p-sm text-primary dark:text-inverse-primary font-bold bg-secondary-container dark:bg-on-secondary-fixed-variant rounded-lg cursor-pointer duration-200 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">fact_check</span>
+<span>Review Queue</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant dark:text-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors cursor-pointer duration-200 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span>Ledger</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant dark:text-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-highest transition-colors cursor-pointer duration-200 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Integrations</span>
+</a>
+</nav>
+<div class="mt-auto pt-md border-t border-outline-variant">
+<button class="w-full bg-primary text-on-primary py-sm px-md rounded font-body-md text-body-md font-bold mb-md hover:brightness-110 transition-all">
+                New Extraction
+            </button>
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:text-on-surface font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">help</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-md p-sm text-on-surface-variant hover:text-on-surface font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">person</span>
+<span>Account</span>
+</a>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="flex justify-between items-center h-16 px-margin-desktop sticky top-0 z-40 bg-surface dark:bg-inverse-surface ml-64 border-b border-outline-variant">
+<div class="flex items-center flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container border border-outline-variant rounded-full py-xs pl-xl pr-md text-body-sm focus:ring-1 focus:ring-primary outline-none" placeholder="Search transactions..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-xs text-on-surface-variant hover:text-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-xs text-on-surface-variant hover:text-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-px bg-outline-variant mx-xs"></div>
+<div class="flex items-center gap-sm">
+<img alt="User profile" class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjEV_eEKynGOGF9FS4nUkCuGuk1m8fFRwfjY9twPkaOiyZcrovLgQwKoULMEosN_p4kgM5gopzMr1Uq9mo2xZJaL1h8OBGUBdybgC65SO_PIntjbjXXahqiebHu7E_CodvWybGVmg0dPIx19N09SkXX9ihfNZCfG7Y257rRKFeXi5ysLGQKT8GXHBCVLvvktjMSQO8qyN_x2i21mouBZFwcnnHtIU44c-l3GbttK18RIR70FpRvDHGATeXW6_hSKf9u9JX4vOY1_M"/>
+<span class="font-body-sm text-body-sm font-bold">Admin Portal</span>
+</div>
+</div>
+</header>
+<!-- Main Content Shell -->
+<main class="ml-64 min-h-[calc(100vh-64px)] p-margin-desktop bg-surface">
+<!-- Queue Header Control -->
+<div class="flex justify-between items-center mb-lg">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">Review Queue</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Entry 14 of 42 pending verification</p>
+</div>
+<div class="flex items-center gap-sm">
+<button class="flex items-center gap-xs px-md py-sm border border-outline-variant rounded-lg bg-surface hover:bg-surface-container transition-colors text-body-md font-bold">
+<span class="material-symbols-outlined">chevron_left</span>
+                    Previous
+                </button>
+<button class="flex items-center gap-xs px-md py-sm border border-outline-variant rounded-lg bg-surface hover:bg-surface-container transition-colors text-body-md font-bold">
+                    Next
+                    <span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- 2-Column Split View -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter items-start h-[calc(100vh-220px)]">
+<!-- Left Column: Receipt Viewer -->
+<div class="h-full border border-outline-variant rounded-xl bg-surface-container-lowest overflow-hidden flex flex-col relative group">
+<div class="absolute top-md right-md flex flex-col gap-sm z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="bg-surface/80 backdrop-blur-md p-xs rounded-lg border border-outline-variant text-on-surface shadow-sm hover:bg-surface">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+<button class="bg-surface/80 backdrop-blur-md p-xs rounded-lg border border-outline-variant text-on-surface shadow-sm hover:bg-surface">
+<span class="material-symbols-outlined">zoom_out</span>
+</button>
+<button class="bg-surface/80 backdrop-blur-md p-xs rounded-lg border border-outline-variant text-on-surface shadow-sm hover:bg-surface">
+<span class="material-symbols-outlined">rotate_right</span>
+</button>
+</div>
+<div class="p-md border-b border-outline-variant bg-surface flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Source: Document_29384.pdf</span>
+<span class="px-sm py-xs bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded uppercase">High Confidence (94%)</span>
+</div>
+<div class="flex-1 overflow-auto bg-[#F1F3F5] p-xl flex justify-center items-start">
+<div class="max-w-md w-full bg-white shadow-xl p-lg transform rotate-1 transition-transform hover:rotate-0">
+<img alt="Digital capture of Starbucks receipt" class="w-full h-auto" data-alt="A hyper-realistic, high-resolution close-up of a crumpled white paper receipt on a dark gray slate textured surface. The receipt is from a coffee shop and shows detailed black ink text, including prices, dates, and a logo. The lighting is bright and clear, emphasizing the texture of the paper and the sharp contrast of the ink, fitting a clean professional financial software aesthetic with a cool, modern mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCH0pm2kZyb5XzKM9OTGn-YHMZ0j4_3n14vZEMcXA-Y6zg5uSMn4fJ1R_IGLCNgH2tFbO98Mf9Kin1jYBZFL08NBkcwcruGOYjt9sXUCJZthTabRLJMcZzC5rmxoS2cyqeSmopfXDwUZWuNsmCapGswCfuTv_DEsvXFQ5HopwnUlQp3hbajNdZFDstW0e9xn5Hw-3o_usHEctsWnTqJPT3HY0GoyQET3MNzxT1a1AmqNgjY9vSQYBi7OtQdP-_Q7rSqUzupMaWUtOU"/>
+</div>
+</div>
+</div>
+<!-- Right Column: AI Extraction Form -->
+<div class="h-full border border-outline-variant rounded-xl bg-surface-container-lowest flex flex-col shadow-sm">
+<div class="p-md border-b border-outline-variant bg-surface">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+                        AI Extraction Data
+                    </h3>
+</div>
+<div class="flex-1 overflow-y-auto p-lg space-y-lg">
+<!-- Form Fields -->
+<div class="space-y-md">
+<div class="grid grid-cols-1 gap-sm">
+<label class="font-body-sm text-body-sm font-bold text-on-surface">Vendor Name</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" type="text" value="Starbucks Coffee #2839"/>
+<div class="absolute right-md top-1/2 -translate-y-1/2 flex gap-xs">
+<span class="material-symbols-outlined text-emerald-600 text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-gutter">
+<div class="space-y-sm">
+<label class="font-body-sm text-body-sm font-bold text-on-surface">Amount ($)</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none font-data-mono text-data-mono" type="text" value="14.58"/>
+</div>
+<div class="space-y-sm">
+<label class="font-body-sm text-body-sm font-bold text-on-surface">Tax Included ($)</label>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none font-data-mono text-data-mono" type="text" value="1.24"/>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-gutter">
+<div class="space-y-sm">
+<label class="font-body-sm text-body-sm font-bold text-on-surface">Date</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none" type="text" value="Oct 24, 2023"/>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant">calendar_today</span>
+</div>
+</div>
+<div class="space-y-sm">
+<label class="font-body-sm text-body-sm font-bold text-on-surface">Category</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none appearance-none">
+<option>Meals &amp; Entertainment</option>
+<option>Travel</option>
+<option>Office Supplies</option>
+<option>Utilities</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<div class="space-y-sm">
+<label class="font-body-sm text-body-sm font-bold text-on-surface">Notes (Optional)</label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant rounded-lg p-md text-body-md focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none resize-none" placeholder="Add additional context for bookkeeping..." rows="3"></textarea>
+</div>
+</div>
+<!-- Validation Messages -->
+<div class="p-md bg-amber-50 border border-amber-200 rounded-lg flex gap-md">
+<span class="material-symbols-outlined text-amber-600">info</span>
+<div class="space-y-xs">
+<p class="font-body-sm text-body-sm font-bold text-amber-900">Duplicate Alert</p>
+<p class="font-body-sm text-body-sm text-amber-800">A transaction with a similar amount and vendor was recorded on Oct 22. Please verify this is not a duplicate scan.</p>
+</div>
+</div>
+</div>
+<!-- Action Footer -->
+<div class="p-lg border-t border-outline-variant bg-surface flex justify-between items-center gap-md">
+<button class="flex items-center gap-xs text-error font-body-md text-body-md font-bold hover:bg-error-container p-sm rounded-lg transition-colors">
+<span class="material-symbols-outlined">delete</span>
+                        Delete
+                    </button>
+<div class="flex items-center gap-md">
+<button class="px-lg py-sm border border-outline-variant rounded-lg bg-surface text-on-surface font-body-md text-body-md font-bold hover:bg-surface-container transition-colors">
+                            Flag for Follow-up
+                        </button>
+<button class="px-xl py-sm bg-primary text-on-primary rounded-lg font-body-md text-body-md font-bold hover:brightness-110 shadow-sm transition-all flex items-center gap-xs">
+<span class="material-symbols-outlined">check</span>
+                            Approve
+                        </button>
+</div>
+</div>
+</div>
+</div>
+<!-- AI Sync Feedback (Minimalist Toast Style) -->
+<div class="fixed bottom-lg right-lg bg-inverse-surface text-inverse-on-surface px-lg py-md rounded-xl flex items-center gap-md shadow-lg border border-outline z-50">
+<span class="relative flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+</span>
+<p class="font-body-sm text-body-sm">AI is processing 3 more uploads in background...</p>
+</div>
+</main>
+</body></html>
