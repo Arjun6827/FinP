@@ -101,6 +101,20 @@ The frontend is a Vite-powered React application.
    ```
 3. Ensure your Firebase configuration is correctly set in `frontend/src/firebase.js` (if applicable, or use environment variables if configured).
 
+### 4. Mobile App Setup
+
+The mobile app is built with React Native and Expo.
+
+1. Navigate to the directory:
+   ```bash
+   cd mobile
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. **Network Configuration**: The app is configured to connect to the backend at `http://192.168.1.9:5000`. You **must** update this IP in `mobile/app/(tabs)/ledger.tsx`, `review.tsx`, and `index.tsx` to match your computer's actual local network IP so that physical devices can connect to it!
+
 ---
 
 ## 🚀 Running the Application
@@ -127,6 +141,21 @@ cd frontend
 npm run dev
 ```
 *Runs on `http://localhost:5173` (or the port specified by Vite)*
+
+### Terminal 4: Mobile App
+```bash
+cd mobile
+npx expo start
+```
+*This will open the Expo developer tool in your terminal.*
+
+#### 🍏 Running on iOS:
+- **Simulator**: Press `i` in the terminal to open the app in the iOS Simulator (Mac required).
+- **Physical Device**: Download the **Expo Go** app from the App Store. Scan the QR code displayed in the terminal with your iPhone's camera.
+
+#### 🤖 Running on Android:
+- **Emulator**: Press `a` in the terminal to open the app in the Android Emulator.
+- **Physical Device**: Download the **Expo Go** app from the Google Play Store. Scan the QR code displayed in the terminal using the Expo Go app.
 
 ---
 

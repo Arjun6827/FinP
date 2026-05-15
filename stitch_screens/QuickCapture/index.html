@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FinPilot - Quick Capture</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#adc6ff",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed": "#131b2e",
+                    "error-container": "#ffdad6",
+                    "surface-container-high": "#e6e8ea",
+                    "surface-bright": "#f7f9fb",
+                    "on-primary": "#ffffff",
+                    "on-secondary-container": "#5c647a",
+                    "primary-container": "#2170e4",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "on-error-container": "#93000a",
+                    "surface-tint": "#005ac2",
+                    "on-surface": "#191c1e",
+                    "on-background": "#191c1e",
+                    "on-error": "#ffffff",
+                    "outline": "#727785",
+                    "on-primary-container": "#fefcff",
+                    "surface-dim": "#d8dadc",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "background": "#f7f9fb",
+                    "primary-fixed": "#d8e2ff",
+                    "on-primary-fixed": "#001a42",
+                    "secondary-fixed": "#dae2fd",
+                    "secondary-container": "#dae2fd",
+                    "error": "#ba1a1a",
+                    "outline-variant": "#c2c6d6",
+                    "on-primary-fixed-variant": "#004395",
+                    "inverse-surface": "#2d3133",
+                    "surface-container-low": "#f2f4f6",
+                    "inverse-primary": "#adc6ff",
+                    "on-surface-variant": "#424754",
+                    "primary": "#0058be",
+                    "tertiary-fixed-dim": "#b7c8e1",
+                    "secondary": "#565e74",
+                    "on-tertiary-container": "#fdfcff",
+                    "tertiary-fixed": "#d3e4fe",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "tertiary-container": "#66768d",
+                    "tertiary": "#4d5d73",
+                    "surface-container-highest": "#e0e3e5",
+                    "surface-container": "#eceef0",
+                    "surface": "#f7f9fb",
+                    "surface-variant": "#e0e3e5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "40px",
+                    "gutter": "16px",
+                    "md": "16px",
+                    "sm": "8px",
+                    "margin-desktop": "32px",
+                    "base": "4px",
+                    "xs": "4px",
+                    "margin-mobile": "16px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "label-caps": ["Inter"],
+                    "headline-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "data-mono": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-sm": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-lg": ["30px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .viewfinder-overlay {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 20%, rgba(0,0,0,0) 80%, rgba(0,0,0,0.8) 100%);
+        }
+        .receipt-guide {
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-black text-white font-body-md overflow-hidden antialiased">
+<!-- Top Navigation (Contextualized TopAppBar) -->
+<header class="fixed top-0 z-50 w-full flex justify-between items-center px-margin-mobile py-sm bg-black/40 backdrop-blur-md">
+<button aria-label="Close" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-white">close</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm tracking-tight text-white">Quick Capture</h1>
+<div class="w-10 flex justify-end">
+<button class="material-symbols-outlined text-white hover:bg-white/10 p-2 rounded-full transition-colors" data-icon="flash_on">flash_on</button>
+</div>
+</header>
+<!-- Main Viewfinder Canvas -->
+<main class="relative h-screen w-full flex items-center justify-center">
+<!-- Background Camera Stream Simulation -->
+<div class="absolute inset-0 z-0">
+<div class="w-full h-full bg-cover bg-center" data-alt="A first-person view through a high-end smartphone camera lens focusing on a crisp white physical business receipt resting on a dark, polished mahogany office desk. The lighting is professional and moody, casting soft shadows across the wooden surface. The UI is focused on capturing data for FinPilot, maintaining a corporate modernism aesthetic with deep blacks and sharp precision. The receipt shows financial line items clearly in a high-stakes business environment." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCXU8n7U_v5uuh5ujiE3hkm-DJ170NCbP0ylEFouWVKqiOt9lRYQq9hVCly37XdE51ffRPGd7fLtILFNq2YpBV3sBiBHB107KUQoeI0KNJP6fZaQC6cMdsq8xExAHabFzgCnXpH0q-LiA0DhWL284lwjaxzsQ7aaJDzrU8qTnMmOTr1KthYOOTh0eJO0iKsudKZTtbXFCf3wVRJUgDMnmQgi_clfEiTFfGA2mqJsaX6UHxE_H4JOZBz6QBIsHAyQSwnAqpU-CeKDBQ')">
+</div>
+<!-- Overlay Gradient for UI Legibility -->
+<div class="viewfinder-overlay absolute inset-0"></div>
+</div>
+<!-- Scanning Guides -->
+<div class="relative z-10 w-[85%] aspect-[3/4] receipt-guide rounded-xl flex items-center justify-center">
+<div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-primary rounded-tl-lg"></div>
+<div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-primary rounded-tr-lg"></div>
+<div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-primary rounded-bl-lg"></div>
+<div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-primary rounded-br-lg"></div>
+<div class="text-center px-lg">
+<span class="font-label-caps text-label-caps text-white/80 uppercase tracking-widest bg-black/40 px-3 py-1 rounded-full backdrop-blur-sm">
+                    Position Receipt Within Frame
+                </span>
+</div>
+</div>
+<!-- Scanning AI Feedback Chips -->
+<div class="absolute top-24 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+<div class="flex items-center gap-base px-3 py-1 bg-primary/20 backdrop-blur-md border border-primary/40 rounded-full">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-caps text-[10px] text-white">AUTO-DETECTING</span>
+</div>
+</div>
+</main>
+<!-- Bottom Controls -->
+<footer class="fixed bottom-0 w-full z-50 px-margin-mobile pb-xl pt-lg">
+<div class="flex items-center justify-between max-w-md mx-auto">
+<!-- Gallery Button -->
+<button class="flex flex-col items-center gap-xs group">
+<div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 group-active:scale-95 transition-all">
+<span class="material-symbols-outlined text-white" data-icon="photo_library">photo_library</span>
+</div>
+<span class="font-label-caps text-[10px] text-white/70 uppercase">Gallery</span>
+</button>
+<!-- Shutter Button -->
+<div class="relative group">
+<div class="absolute inset-0 bg-primary/20 rounded-full blur-xl group-active:scale-125 transition-transform duration-300"></div>
+<button class="relative w-20 h-20 rounded-full border-4 border-white p-1 bg-transparent group-active:scale-95 transition-all duration-150">
+<div class="w-full h-full rounded-full bg-white flex items-center justify-center">
+<div class="w-full h-full rounded-full border-2 border-black/10"></div>
+</div>
+</button>
+</div>
+<!-- Mode Selector / Settings -->
+<button class="flex flex-col items-center gap-xs group">
+<div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 group-active:scale-95 transition-all">
+<span class="material-symbols-outlined text-white" data-icon="document_scanner">document_scanner</span>
+</div>
+<span class="font-label-caps text-[10px] text-white/70 uppercase">OCR Mode</span>
+</button>
+</div>
+<!-- Captured Items Preview (Subtle) -->
+<div class="mt-lg flex justify-center">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded border border-white/30 bg-surface-dim overflow-hidden rotate-[-5deg]">
+<img alt="prev1" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEYg2bgpO9qvcSqp5kccNZhLEL089_62BStYPTUwDJuVnJladkO24YH_TennjdOwv8tv0txre_1gwDxME07i5l4ZLUy0QrIrWHUE3Z-owS6-x0qQ__EaxTSxmzDL9CBacO9o8vUe_Mfw1LDpZ_FGXs2ixzYwNatyXPo1pO2mts6g71ehoVTCX-ar7tEU0v5vkNZRQukv8rdhpwqTOAi2vJZX0PUL1xB4uKose77h7uZLsiR32HQ9MzOyBc0-1_Yh1JU081z_MDEOY"/>
+</div>
+<div class="w-8 h-8 rounded border border-white/30 bg-surface-dim overflow-hidden rotate-[3deg] z-10 shadow-lg">
+<img alt="prev2" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9X4Z-KkZgguq5zTDWYrAAfxuWvxl0NYpA-ZK9OTvv_tTtBiMiCvH6Cm9WGLUWif4f_Cf1s3Pc3WaL6MVqeuYx_e7jLtkTAZ6IAoqtf24jjI6_s6zWHIGntCSTZDEUP9g6FvkPdlxBrtJ0w2LE_8srh-jesP6nTPrQL3DOEKmMSqR1EJV-_q0f98BHcYBeTMeDyUDAdnWstu88LlV5q9-qfyYx7kUw9to2Q_TINg0qRjNeA1fFIpDmlTQtUlqg7zBnYmCFK3hoQLc"/>
+</div>
+</div>
+<span class="ml-4 font-label-caps text-label-caps text-white flex items-center">
+                2 Ready to Review
+                <span class="material-symbols-outlined ml-1 text-sm">arrow_forward_ios</span>
+</span>
+</div>
+</footer>
+<!-- AI Intelligence Tooltip -->
+<div class="fixed top-1/2 left-4 -translate-y-1/2 z-30 flex flex-col gap-sm">
+<div class="bg-black/60 backdrop-blur-lg border border-white/10 p-2 rounded-lg flex flex-col items-center gap-xs">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="center_focus_weak">center_focus_weak</span>
+<div class="h-8 w-[1px] bg-white/10"></div>
+<span class="material-symbols-outlined text-white/40 text-sm" data-icon="light_mode">light_mode</span>
+<div class="h-8 w-[1px] bg-white/10"></div>
+<span class="material-symbols-outlined text-white/40 text-sm" data-icon="straighten">straighten</span>
+</div>
+</div>
+</body></html>

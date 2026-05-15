@@ -79,7 +79,7 @@ app.get('/health', (req, res) => {
 // 🔐 GET /api/inbox  — Read Firestore inbox, decrypt sensitive fields, return plaintext
 app.get('/api/inbox', async (req, res) => {
   try {
-    const snapshot = await db.collection('inbox').orderBy('timestamp', 'desc').get();
+    const snapshot = await db.collection('inbox').get();
     const items = snapshot.docs.map(doc => {
       const d = doc.data();
       const ocrResult = d.ocrResults?.[0] || {};
@@ -110,6 +110,30 @@ app.get('/api/inbox', async (req, res) => {
     res.json({ success: true, items });
   } catch (err) {
     console.error('GET /api/inbox error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 🔄 PUT /api/inbox/:id  — Update document
+app.put('/api/inbox/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.collection('inbox').doc(id).update(req.body);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('PUT /api/inbox error:', err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// 🗑️ DELETE /api/inbox/:id  — Delete document
+app.delete('/api/inbox/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await db.collection('inbox').doc(id).delete();
+    res.json({ success: true });
+  } catch (err) {
+    console.error('DELETE /api/inbox error:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });
