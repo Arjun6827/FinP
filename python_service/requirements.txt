@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+python-multipart
+firebase-admin
+google-generativeai
+flask
+flask-cors

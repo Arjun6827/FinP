@@ -3,12 +3,12 @@ import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 
 // Replace these with your actual Firebase project configuration
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBhZt85LMygYvn59-x9skxofv8UP9k7Tpw",
+  authDomain: "finpilot-c6bb4.firebaseapp.com",
+  projectId: "finpilot-c6bb4",
+  storageBucket: "finpilot-c6bb4.firebasestorage.app",
+  messagingSenderId: "511343250245",
+  appId: "1:511343250245:web:891886fb71648049b8cc2c"
 };
 
 // Initialize Firebase
