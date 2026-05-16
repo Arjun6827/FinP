@@ -51,17 +51,13 @@ The Python service handles email polling, attachment extraction, and sending ima
 3. Install dependencies:
    ```bash
    python -m pip install -r requirements.txt
-   # Ensure cryptography is installed
-   python -m pip install cryptography
+   python -m pip install cryptography firebase-admin google-generativeai flask
    ```
-4. Create a `.env` file in the `python_service` directory:
-   ```env
-   GEMINI_API_KEY=your_gemini_api_key_here
-   GMAIL_USER=your_email@gmail.com
-   GMAIL_PASS=your_gmail_app_password_here
-   FINPILOT_ENCRYPTION_KEY=gqI8zWlPULejy4RRP5bkWrWWfQjRuBY5i-TjOVN4dso=
-   ```
-   *Note: You can generate a new Fernet key with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`*
+4. **Configuration (Firestore DB)**: 
+   The app reads all configurations from Firestore dynamically. You can set them up in the Web UI (Settings page) or manually in Firestore. **No `.env` files are required** for keys or passwords!
+   - **Gemini API Key**: Save to `settings/gemini` with field `key`.
+   - **IMAP Config**: Save to `settings/imap` with fields `server`, `email`, `password`.
+   - **Encryption Key**: Save to `settings/encryption` with field `key`.
 
 5. Place your Firebase `serviceAccountKey.json` in the `python_service` directory.
 
@@ -77,14 +73,11 @@ The Node.js backend handles API requests, serves static files, and decrypts data
    ```bash
    npm install
    ```
-3. Create a `.env` file in the `backend` directory:
+3. Create a `.env` file in the `backend` directory (Optional):
    ```env
    PORT=5000
-   STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret_here
-   FINPILOT_ENCRYPTION_KEY=gqI8zWlPULejy4RRP5bkWrWWfQjRuBY5i-TjOVN4dso=
    ```
-   *Note: The `FINPILOT_ENCRYPTION_KEY` must match the one in the Python service.*
-
+   *Note: The encryption key is now fetched from Firestore, so you don't need to put it here!*
 4. Place the same Firebase `serviceAccountKey.json` in the `backend` directory.
 
 ### 3. Frontend Setup
@@ -99,7 +92,7 @@ The frontend is a Vite-powered React application.
    ```bash
    npm install
    ```
-3. Ensure your Firebase configuration is correctly set in `frontend/src/firebase.js` (if applicable, or use environment variables if configured).
+3. Ensure your Firebase configuration is correctly set in `frontend/src/firebase.js`.
 
 ### 4. Mobile App Setup
 
@@ -113,7 +106,9 @@ The mobile app is built with React Native and Expo.
    ```bash
    npm install
    ```
-3. **Network Configuration**: The app is configured to connect to the backend at `http://192.168.1.9:5000`. You **must** update this IP in `mobile/app/(tabs)/ledger.tsx`, `review.tsx`, and `index.tsx` to match your computer's actual local network IP so that physical devices can connect to it!
+3. **Firebase Setup**: We have added real Firebase Auth to the mobile app. Ensure `mobile/firebase.ts` has the correct config matching your `frontend/src/firebase.js`.
+4. **Network Configuration**: The app is configured to connect to the backend at `http://192.168.1.9:5000` or similar. You **must** update this IP in the files inside `mobile/app/` to match your computer's actual local network IP so that physical devices or simulators can connect to it!
+
 
 ---
 
