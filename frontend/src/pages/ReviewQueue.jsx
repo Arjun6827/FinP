@@ -77,11 +77,11 @@ export default function ReviewQueue() {
       const updatedOcrResults = [...(currentDoc.ocrResults || [])];
       if (updatedOcrResults[0]) {
         updatedOcrResults[0].data = {
-          vendor: vendorRef.current.value,
-          amount: parseFloat(amountRef.current.value),
-          date: dateRef.current.value,
-          category: categoryRef.current.value,
-          confidence: updatedOcrResults[0].confidence_score
+          vendor: vendorRef.current.value || '',
+          amount: parseFloat(amountRef.current.value) || 0,
+          date: dateRef.current.value || '',
+          category: categoryRef.current.value || '',
+          confidence: updatedOcrResults[0].confidence_score || 1.0
         };
         // Remove encryptedData once user has reviewed and approved
         delete updatedOcrResults[0].encryptedData;
