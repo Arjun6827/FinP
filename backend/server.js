@@ -304,6 +304,46 @@ app.post('/api/webhooks/email', upload.any(), async (req, res) => {
   }
 });
 
+// 🤖 POST /api/forecast/insights — Gemini AI analysis of cash flow
+app.post('/api/forecast/insights', async (req, res) => {
+  const { avgMonthlyBurn, projectedBurn, startingBalance, runwayMonths, categoryTotals, anomalies } = req.body;
+
+  try {
+    // Load Gemini API key from Firestore, fallback to env
+    let apiKey = process.env.GEMINI_API_KEY;
+    try {
+      const snap = await db.collection('settings').doc('gemini').get();
+      if (snap.exists && snap.data().apiKey) apiKey = snap.data().apiKey;
+    } catch (_) {}
+
+    if (!apiKey) return res.json({ insight: null });
+
+    const prompt = `You are a financial advisor for a small business. Analyze this cash flow data and provide a 2-3 sentence insight with specific, actionable advice.
+
+Data:
+- Average monthly burn rate: $${Math.round(avgMonthlyBurn)}
+- Projected burn (with scenarios): $${Math.round(projectedBurn)}
+- Starting balance: $${Math.round(startingBalance)}
+- Cash runway: ${runwayMonths !== null ? runwayMonths + ' months' : 'unlimited'}
+- Spend by category: ${JSON.stringify(categoryTotals)}
+- Anomalous months (>20% above avg): ${JSON.stringify(anomalies)}
+
+Be direct and specific. Mention the biggest risk or opportunity based on this data.`;
+
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      { contents: [{ parts: [{ text: prompt }] }] },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+
+    const insight = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || null;
+    res.json({ insight });
+  } catch (err) {
+    console.error('Forecast insights error:', err.message);
+    res.json({ insight: null });
+  }
+});
+
 // Start Server
 app.listen(PORT, () => {
   console.log(`FinPilot Backend running on http://localhost:${PORT}`);

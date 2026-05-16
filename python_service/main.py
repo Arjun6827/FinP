@@ -1,6 +1,7 @@
 import os
 import io
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
@@ -20,9 +21,8 @@ app.add_middleware(
 
 # Configure Gemini
 api_key = os.environ.get("GEMINI_API_KEY")
-if api_key:
-    genai.configure(api_key=api_key)
-else:
+gemini_client = genai.Client(api_key=api_key) if api_key else None
+if not api_key:
     print("WARNING: GEMINI_API_KEY not found in environment.")
 
 @app.get("/health")
@@ -34,14 +34,11 @@ async def extract_receipt_data(file: UploadFile = File(...)):
     """
     Receives an image/pdf, sends it to Gemini Pro Vision, and returns extracted JSON schema.
     """
-    if not api_key:
+    if not gemini_client:
         raise HTTPException(status_code=500, detail="Gemini API Key not configured")
 
     try:
         content = await file.read()
-        
-        # We need a model. For images, we can use gemini-2.5-flash
-        model = genai.GenerativeModel('gemini-2.5-flash')
         
         prompt = """
         You are an expert financial data extractor. Analyze this receipt/invoice and extract the following information.
@@ -55,13 +52,13 @@ async def extract_receipt_data(file: UploadFile = File(...)):
         If a field is missing, use null.
         """
         
-        # In actual usage for binary files with google.generativeai we need to pass a dict with mime_type and data
-        image_part = {
-            "mime_type": file.content_type,
-            "data": content
-        }
-        
-        response = model.generate_content([prompt, image_part])
+        response = gemini_client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=[
+                prompt,
+                types.Part.from_bytes(data=content, mime_type=file.content_type)
+            ]
+        )
         
         # Response text should be JSON (usually wrapped in ```json ... ```)
         text = response.text
