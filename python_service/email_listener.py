@@ -10,7 +10,8 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials, firestore
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from privacy import mask, safe_log       # 🛡️ PII log masking
 from encryption import encrypt_extracted_data  # 🔐 At-rest encryption
 
@@ -23,12 +24,12 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 # Gemini Setup
-model_instance = None
+gemini_client = None
 
-def get_gemini_model():
-    global model_instance
-    if model_instance is not None:
-        return model_instance
+def get_gemini_client():
+    global gemini_client
+    if gemini_client is not None:
+        return gemini_client
         
     try:
         # Read from Firestore
@@ -45,9 +46,8 @@ def get_gemini_model():
             print("Using Gemini API Key from Environment", flush=True)
             
         if api_key:
-            genai.configure(api_key=api_key)
-            model_instance = genai.GenerativeModel('gemini-3.1-flash-lite')
-            return model_instance
+            gemini_client = genai.Client(api_key=api_key)
+            return gemini_client
         else:
             print("WARNING: Gemini API Key not found!", flush=True)
             return None
@@ -56,9 +56,8 @@ def get_gemini_model():
         # Fallback to env
         api_key = os.getenv("GEMINI_API_KEY")
         if api_key:
-            genai.configure(api_key=api_key)
-            model_instance = genai.GenerativeModel('gemini-3.1-flash-lite')
-            return model_instance
+            gemini_client = genai.Client(api_key=api_key)
+            return gemini_client
         return None
 
 def get_imap_config():
@@ -110,15 +109,18 @@ def extract_data_with_gemini(image_data, mime_type):
     }
     """
     try:
-        model = get_gemini_model()
-        if not model:
-            print("Gemini model not available", flush=True)
+        client = get_gemini_client()
+        if not client:
+            print("Gemini client not available", flush=True)
             return None
-            
-        response = model.generate_content([
-            prompt,
-            {'mime_type': mime_type, 'data': image_data}
-        ])
+
+        response = client.models.generate_content(
+            model='gemini-2.0-flash-lite',
+            contents=[
+                prompt,
+                types.Part.from_bytes(data=image_data, mime_type=mime_type)
+            ]
+        )
         # Clean the response text to get valid JSON
         text = response.text.replace('```json', '').replace('```', '').strip()
         return json.loads(text)
@@ -193,6 +195,12 @@ def check_email():
         message_ids = messages[0].split()
         print(f"Found {len(message_ids)} unseen email(s).", flush=True)
 
+        # Keywords that indicate an invoice/receipt email
+        INVOICE_KEYWORDS = [
+            'invoice', 'receipt', 'payment', 'order confirmation',
+            'purchase', 'transaction', 'billing', 'statement', 'bill'
+        ]
+
         for msg_id in message_ids:
             status, data = mail.fetch(msg_id, "(RFC822)")
             if status != "OK": continue
@@ -204,8 +212,15 @@ def check_email():
 
             # 🛡️ Mask sender info before logging
             sender = mask(msg.get('From', 'Unknown'))
-            subject = mask(msg.get('Subject', '(no subject)'))
-            print(f"Processing email — From: {sender} | Subject: {subject}", flush=True)
+            raw_subject = msg.get('Subject', '(no subject)')
+            subject = mask(raw_subject)
+
+            # Filter: only process emails that look like invoices/receipts
+            if not any(kw in raw_subject.lower() for kw in INVOICE_KEYWORDS):
+                print(f"Skipping non-invoice email — Subject: {subject}", flush=True)
+                continue  # Leave unread, do not process
+
+            print(f"Processing invoice email — From: {sender} | Subject: {subject}", flush=True)
             
             for part in msg.walk():
                 if part.get_content_maintype() == 'multipart': continue
