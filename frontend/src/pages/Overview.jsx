@@ -321,10 +321,11 @@ export default function Overview() {
                       const fileUrl = item?.ocrResults?.[0]?.fileUrl || '';
                       if (fileUrl.toLowerCase().endsWith('.pdf')) {
                         return (
-                          <div className="flex flex-col items-center gap-xs text-primary">
-                            <span className="material-symbols-outlined text-[64px]">picture_as_pdf</span>
-                            <span className="font-label-caps text-[10px]">PDF Document</span>
-                          </div>
+                          <iframe 
+                            src={`${fileUrl}#toolbar=0&navpanes=0&scrollbar=0`} 
+                            className="w-full h-full border-none pointer-events-none"
+                            title="PDF Preview"
+                          />
                         );
                       }
                       return fileUrl ? (
