@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, updateDoc, doc } from 'firebase/firestore';
 import toast from 'react-hot-toast';
 import { jsPDF } from "jspdf";
 import { db } from '../firebase';
@@ -7,11 +7,7 @@ import { db } from '../firebase';
 export default function Forecast() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [scenarios, setScenarios] = useState({
-    addEmployee: false,
-    cutSaaS: false,
-    increaseAds: false
-  });
+  const [scenarios, setScenarios] = useState([]);
 
   useEffect(() => {
     const q = query(collection(db, 'inbox'), where('status', '==', 'approved'));
@@ -24,31 +20,56 @@ export default function Forecast() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    console.log('Forecast: Fetching scenarios...');
+    const unsubscribe = onSnapshot(collection(db, 'scenarios'), (snapshot) => {
+      const items = [];
+      snapshot.forEach((doc) => items.push({ id: doc.id, ...doc.data() }));
+      console.log('Forecast: Fetched scenarios:', items);
+      setScenarios(items);
+    }, (error) => {
+      console.error('Forecast: Firestore onSnapshot error:', error);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const totalHistoricalSpend = transactions.reduce((sum, t) => sum + (t.ocrResults?.[0]?.data?.amount || 0), 0);
   const avgMonthlyBurn = transactions.length > 0 ? (totalHistoricalSpend / Math.max(1, transactions.length / 5)) : 12500;
 
   // Scenario Adjustments
-  const employeeCost = 8500;
-  const saasSavings = 1200;
-  const adCost = 3000;
-
   let projectedBurn = avgMonthlyBurn;
-  if (scenarios.addEmployee) projectedBurn += employeeCost;
-  if (scenarios.cutSaaS) projectedBurn -= saasSavings;
-  if (scenarios.increaseAds) projectedBurn += adCost;
+  scenarios.forEach(s => {
+    if (s.isActive) {
+      projectedBurn += s.impact;
+    }
+  });
+
+  const payrollScenarios = scenarios.filter(s => s.category === 'Payroll & Benefits' && s.isActive);
+  const saasScenarios = scenarios.filter(s => s.category === 'Software & SaaS' && s.isActive);
+  const marketingScenarios = scenarios.filter(s => s.category === 'Marketing & Sales' && s.isActive);
+
+  const payrollImpact = payrollScenarios.reduce((sum, s) => sum + s.impact, 0);
+  const saasImpact = saasScenarios.reduce((sum, s) => sum + s.impact, 0);
+  const marketingImpact = marketingScenarios.reduce((sum, s) => sum + s.impact, 0);
 
   const estimatedBalance = 150000 - projectedBurn;
   const safeToSpend = estimatedBalance * 0.45;
 
   const formatCurrency = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
 
-  const toggleScenario = (key, label) => {
-    const newState = !scenarios[key];
-    setScenarios(prev => ({ ...prev, [key]: newState }));
-    toast(newState ? `Applied: ${label}` : `Removed: ${label}`, {
-      icon: newState ? '✅' : '🔄',
-      style: { borderRadius: '10px', background: '#333', color: '#fff' }
-    });
+  const toggleScenario = async (id, currentStatus, label) => {
+    try {
+      await updateDoc(doc(db, 'scenarios', id), {
+        isActive: !currentStatus
+      });
+      toast(!currentStatus ? `Applied: ${label}` : `Removed: ${label}`, {
+        icon: !currentStatus ? '✅' : '🔄',
+        style: { borderRadius: '10px', background: '#333', color: '#fff' }
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update scenario');
+    }
   };
 
   const [viewMode, setViewMode] = useState('Monthly');
@@ -225,11 +246,9 @@ export default function Forecast() {
                 {(() => {
                   // Today is at x=400, y=170
                   // Jul is at x=800
-                  // If burn is "neutral" (12500), we go to y=75 (Upwards trend)
-                  // If burn is high, y increases (goes down)
-                  const baseBurn = 12500;
-                  const burnDiff = (projectedBurn - baseBurn) / 50; // Factor to scale movement
-                  const endY = Math.max(20, Math.min(220, 75 + burnDiff));
+                  // Scale the drop based on the difference between projected burn and average burn
+                  const scale = 0.005; // Make it much more dramatic
+                  const endY = Math.max(10, Math.min(230, 170 + (projectedBurn - avgMonthlyBurn) * scale));
                   const midY1 = 170 + (endY - 170) * 0.33;
                   const midY2 = 170 + (endY - 170) * 0.66;
                   
@@ -286,65 +305,31 @@ export default function Forecast() {
             <div className="p-md space-y-md flex-grow">
               <p className="text-body-sm text-on-surface-variant mb-md">Toggle "What-if" variables to see impact on your 3-month forecast.</p>
               
-              {/* Scenario Toggle 1 */}
-              <div 
-                onClick={() => toggleScenario('addEmployee', 'Add New Employee')}
-                className={`group p-sm border rounded-lg transition-all cursor-pointer ${scenarios.addEmployee ? 'border-primary bg-primary-container/10' : 'border-outline-variant hover:border-primary'}`}
-              >
-                <div className="flex justify-between items-start mb-sm">
-                  <div className="flex items-center gap-sm">
-                    <span className={`material-symbols-outlined ${scenarios.addEmployee ? 'text-primary' : 'text-on-surface-variant'}`}>person_add</span>
-                    <span className="font-body-md font-bold">Add New Employee</span>
+              {scenarios.map((s) => (
+                <div 
+                  key={s.id}
+                  onClick={() => toggleScenario(s.id, s.isActive, s.title)}
+                  className={`group p-sm border rounded-lg transition-all cursor-pointer ${s.isActive ? 'border-primary bg-primary-container/10' : 'border-outline-variant hover:border-primary'}`}
+                >
+                  <div className="flex justify-between items-start mb-sm">
+                    <div className="flex items-center gap-sm">
+                      <span className={`material-symbols-outlined ${s.isActive ? 'text-primary' : 'text-on-surface-variant'}`}>
+                        {s.type === 'expense' ? 'arrow_upward' : 'arrow_downward'}
+                      </span>
+                      <span className="font-body-md font-bold">{s.title}</span>
+                    </div>
+                    <div className={`w-10 h-5 rounded-full relative transition-colors ${s.isActive ? 'bg-primary' : 'bg-surface-container-highest'}`}>
+                      <div className={`absolute top-[2px] w-4 h-4 bg-white rounded-full shadow-sm transition-all ${s.isActive ? 'right-[2px]' : 'left-[2px]'}`}></div>
+                    </div>
                   </div>
-                  <div className={`w-10 h-5 rounded-full relative transition-colors ${scenarios.addEmployee ? 'bg-primary' : 'bg-surface-container-highest'}`}>
-                    <div className={`absolute top-[2px] w-4 h-4 bg-white rounded-full shadow-sm transition-all ${scenarios.addEmployee ? 'right-[2px]' : 'left-[2px]'}`}></div>
-                  </div>
-                </div>
-                <div className="flex justify-between text-body-sm">
-                  <span className="text-on-surface-variant">Est. Impact:</span>
-                  <span className="text-error font-medium">-$8,500/mo</span>
-                </div>
-              </div>
-
-              {/* Scenario Toggle 2 */}
-              <div 
-                onClick={() => toggleScenario('cutSaaS', 'Cut SaaS Spend')}
-                className={`group p-sm border rounded-lg transition-all cursor-pointer ${scenarios.cutSaaS ? 'border-primary bg-primary-container/10' : 'border-outline-variant hover:border-primary'}`}
-              >
-                <div className="flex justify-between items-start mb-sm">
-                  <div className="flex items-center gap-sm">
-                    <span className={`material-symbols-outlined ${scenarios.cutSaaS ? 'text-primary' : 'text-on-surface-variant'}`}>cloud_off</span>
-                    <span className="font-body-md font-bold">Cut SaaS Spend</span>
-                  </div>
-                  <div className={`w-10 h-5 rounded-full relative transition-colors ${scenarios.cutSaaS ? 'bg-primary' : 'bg-surface-container-highest'}`}>
-                    <div className={`absolute top-[2px] w-4 h-4 bg-white rounded-full shadow-sm transition-all ${scenarios.cutSaaS ? 'right-[2px]' : 'left-[2px]'}`}></div>
+                  <div className="flex justify-between text-body-sm">
+                    <span className="text-on-surface-variant">Est. Impact:</span>
+                    <span className={`font-bold ${s.impact < 0 ? 'text-emerald-600' : 'text-error'}`}>
+                      {s.impact < 0 ? `+$${Math.abs(s.impact).toLocaleString()}` : `-$${s.impact.toLocaleString()}`}/mo
+                    </span>
                   </div>
                 </div>
-                <div className="flex justify-between text-body-sm">
-                  <span className="text-on-surface-variant">Est. Impact:</span>
-                  <span className="text-emerald-600 font-bold">+$1,200/mo</span>
-                </div>
-              </div>
-
-              {/* Scenario Toggle 3 */}
-              <div 
-                onClick={() => toggleScenario('increaseAds', 'Increase Ad Budget')}
-                className={`group p-sm border rounded-lg transition-all cursor-pointer ${scenarios.increaseAds ? 'border-primary bg-primary-container/10' : 'border-outline-variant hover:border-primary'}`}
-              >
-                <div className="flex justify-between items-start mb-sm">
-                  <div className="flex items-center gap-sm">
-                    <span className={`material-symbols-outlined ${scenarios.increaseAds ? 'text-primary' : 'text-on-surface-variant'}`}>campaign</span>
-                    <span className="font-body-md font-bold">Increase Ad Budget</span>
-                  </div>
-                  <div className={`w-10 h-5 rounded-full relative transition-colors ${scenarios.increaseAds ? 'bg-primary' : 'bg-surface-container-highest'}`}>
-                    <div className={`absolute top-[2px] w-4 h-4 bg-white rounded-full shadow-sm transition-all ${scenarios.increaseAds ? 'right-[2px]' : 'left-[2px]'}`}></div>
-                  </div>
-                </div>
-                <div className="flex justify-between text-body-sm">
-                  <span className="text-on-surface-variant">Est. Impact:</span>
-                  <span className="text-error font-medium">-$3,000/mo</span>
-                </div>
-              </div>
+              ))}
             </div>
             
             <div className="p-md border-t border-outline-variant bg-surface-container-low">
@@ -377,15 +362,15 @@ export default function Forecast() {
                   <th className="px-md py-sm font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant text-right">Avg. Historical</th>
                   <th className="px-md py-sm font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant text-right">Month 1 (P)</th>
                   <th className="px-md py-sm font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant text-right">Month 2 (P)</th>
-                  <th className="px-md py-sm font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant text-right text-primary font-bold">Confidence</th>
+                  <th className="px-md py-sm font-label-caps text-label-caps text-on-surface-variant border-b border-outline-variant text-center text-primary font-bold">Confidence</th>
                 </tr>
               </thead>
               <tbody className="text-body-sm divide-y divide-outline-variant">
                 <tr className="hover:bg-primary/5 transition-colors">
                   <td className="px-md py-md font-medium">Payroll & Benefits</td>
-                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(scenarios.addEmployee ? 53500 : 45000)}</td>
-                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(scenarios.addEmployee ? 53500 : 45000)}</td>
-                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(scenarios.addEmployee ? 53500 : 45000)}</td>
+                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(45000)}</td>
+                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(45000 + payrollImpact)}</td>
+                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(45000 + payrollImpact)}</td>
                   <td className="px-md py-md text-center">
                     <span className="bg-emerald-100 text-emerald-800 px-sm py-1 rounded text-[10px] font-bold uppercase tracking-tighter">High (98%)</span>
                   </td>
@@ -393,8 +378,8 @@ export default function Forecast() {
                 <tr className="hover:bg-primary/5 transition-colors">
                   <td className="px-md py-md font-medium">Software & SaaS</td>
                   <td className="px-md py-md text-right font-data-mono">{formatCurrency(3200)}</td>
-                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(scenarios.cutSaaS ? 2000 : 3200)}</td>
-                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(scenarios.cutSaaS ? 2000 : 3200)}</td>
+                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(3200 + saasImpact)}</td>
+                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(3200 + saasImpact)}</td>
                   <td className="px-md py-md text-center">
                     <span className="bg-amber-100 text-amber-800 px-sm py-1 rounded text-[10px] font-bold uppercase tracking-tighter">Medium (85%)</span>
                   </td>
@@ -402,8 +387,8 @@ export default function Forecast() {
                 <tr className="hover:bg-primary/5 transition-colors">
                   <td className="px-md py-md font-medium">Marketing & Sales</td>
                   <td className="px-md py-md text-right font-data-mono">{formatCurrency(8000)}</td>
-                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(scenarios.increaseAds ? 11000 : 8000)}</td>
-                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(scenarios.increaseAds ? 11000 : 8000)}</td>
+                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(8000 + marketingImpact)}</td>
+                  <td className="px-md py-md text-right font-data-mono">{formatCurrency(8000 + marketingImpact)}</td>
                   <td className="px-md py-md text-center">
                     <span className="bg-blue-100 text-blue-800 px-sm py-1 rounded text-[10px] font-bold uppercase tracking-tighter">Variable (70%)</span>
                   </td>

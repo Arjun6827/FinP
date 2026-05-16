@@ -58,5 +58,8 @@ export default defineConfig({
         ]
       }
     })
-  ]
+  ],
+  server: {
+    allowedHosts: ['politically-apologal-maxima.ngrok-free.dev']
+  }
 })

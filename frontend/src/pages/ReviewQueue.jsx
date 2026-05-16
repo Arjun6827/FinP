@@ -163,9 +163,9 @@ export default function ReviewQueue() {
     );
   }
 
-  const currentDoc = queue[currentIndex];
+  const currentDoc = queue[currentIndex] || queue[0];
   // 🔓 Use backend-decrypted data if available, fallback to raw data for legacy docs
-  const ocrData = decryptedMap[currentDoc.id] || currentDoc.ocrResults?.[0]?.data || {};
+  const ocrData = currentDoc ? (decryptedMap[currentDoc.id] || currentDoc.ocrResults?.[0]?.data || {}) : {};
   const filename = currentDoc.ocrResults?.[0]?.filename || currentDoc.attachments?.[0] || 'Unknown Document';
   const confidence = currentDoc.ocrResults?.[0]?.confidence_score || 0.95;
 

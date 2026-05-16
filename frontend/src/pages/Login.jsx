@@ -1,13 +1,49 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword, sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth";
+import { auth } from "../firebase";
+import toast from 'react-hot-toast';
 
 export default function Login() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Simulate auth, then redirect to dashboard
-    navigate('/dashboard');
+    
+    try {
+      await setPersistence(
+        auth, 
+        rememberMe ? browserLocalPersistence : browserSessionPersistence
+      );
+      
+      await signInWithEmailAndPassword(auth, email, password);
+      toast.success('Logged in successfully!');
+      navigate('/dashboard');
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || 'Failed to login');
+    }
+  };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!email) {
+      toast.error('Please enter your email address first');
+      return;
+    }
+    
+    const toastId = toast.loading('Sending reset email...');
+    try {
+      await sendPasswordResetEmail(auth, email);
+      toast.success('Password reset email sent!', { id: toastId });
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message || 'Failed to send reset email', { id: toastId });
+    }
   };
 
   return (
@@ -34,7 +70,15 @@ export default function Login() {
             <label className="font-body-sm text-body-sm font-bold text-on-surface" htmlFor="email">Email Address</label>
             <div className="relative">
               <span className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline" data-icon="mail">mail</span>
-              <input className="w-full pl-xl pr-md py-sm bg-surface border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md text-on-surface" id="email" name="email" placeholder="name@company.com" type="email"/>
+              <input 
+                className="w-full pl-xl pr-md py-sm bg-surface border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md text-on-surface" 
+                id="email" 
+                name="email" 
+                placeholder="name@company.com" 
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
           </div>
 
@@ -42,20 +86,47 @@ export default function Login() {
           <div className="flex flex-col gap-xs">
             <div className="flex justify-between items-center">
               <label className="font-body-sm text-body-sm font-bold text-on-surface" htmlFor="password">Password</label>
-              <a className="font-body-sm text-body-sm text-primary hover:underline transition-colors" href="#">Forgot password?</a>
+              <button 
+                type="button"
+                onClick={handleForgotPassword}
+                className="font-body-sm text-body-sm text-primary hover:underline transition-colors bg-transparent border-none p-0"
+              >
+                Forgot password?
+              </button>
             </div>
             <div className="relative">
               <span className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline" data-icon="lock">lock</span>
-              <input className="w-full pl-xl pr-xl py-sm bg-surface border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md text-on-surface" id="password" name="password" placeholder="••••••••" type="password"/>
-              <button className="absolute right-md top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors" type="button">
-                <span className="material-symbols-outlined" data-icon="visibility">visibility</span>
+              <input 
+                className="w-full pl-xl pr-xl py-sm bg-surface border border-outline-variant rounded focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-md text-on-surface" 
+                id="password" 
+                name="password" 
+                placeholder="••••••••" 
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button 
+                className="absolute right-md top-1/2 -translate-y-1/2 text-outline hover:text-on-surface transition-colors" 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <span className="material-symbols-outlined" data-icon={showPassword ? 'visibility_off' : 'visibility'}>
+                  {showPassword ? 'visibility_off' : 'visibility'}
+                </span>
               </button>
             </div>
           </div>
 
           {/* Remember Me & State */}
           <div className="flex items-center">
-            <input className="w-4 h-4 text-primary border-outline-variant rounded focus:ring-primary focus:ring-offset-0" id="remember" name="remember" type="checkbox"/>
+            <input 
+              className="w-4 h-4 text-primary border-outline-variant rounded focus:ring-primary focus:ring-offset-0" 
+              id="remember" 
+              name="remember" 
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
             <label className="ml-sm font-body-sm text-body-sm text-on-surface-variant cursor-pointer" htmlFor="remember">Keep me logged in</label>
           </div>
 
@@ -69,7 +140,7 @@ export default function Login() {
         <div className="mt-xl pt-lg border-t border-outline-variant text-center">
           <p className="font-body-sm text-body-sm text-on-surface-variant">
             Don't have an account? 
-            <a className="text-primary font-bold hover:underline transition-colors ml-xs" href="#">Create an account</a>
+            <Link className="text-primary font-bold hover:underline transition-colors ml-xs" to="/signup">Create an account</Link>
           </p>
         </div>
       </div>

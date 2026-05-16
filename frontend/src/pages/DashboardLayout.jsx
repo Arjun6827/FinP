@@ -94,8 +94,15 @@ export default function DashboardLayout() {
             to="/integrations" 
             className={({isActive}) => `flex items-center gap-md p-md font-body-md text-body-md rounded-lg cursor-pointer duration-200 ${isActive ? 'text-primary font-bold bg-secondary-container' : 'text-on-surface-variant hover:bg-surface-container-low transition-colors'}`}
           >
-            <span className="material-symbols-outlined" data-icon="settings">settings</span>
+            <span className="material-symbols-outlined" data-icon="hub">hub</span>
             <span>Integrations</span>
+          </NavLink>
+          <NavLink 
+            to="/settings" 
+            className={({isActive}) => `flex items-center gap-md p-md font-body-md text-body-md rounded-lg cursor-pointer duration-200 ${isActive ? 'text-primary font-bold bg-secondary-container' : 'text-on-surface-variant hover:bg-surface-container-low transition-colors'}`}
+          >
+            <span className="material-symbols-outlined" data-icon="settings">settings</span>
+            <span>Settings</span>
           </NavLink>
         </nav>
       </aside>
@@ -137,7 +144,7 @@ export default function DashboardLayout() {
                   <p className="font-body-sm font-bold text-on-surface">Fin Pilot</p>
                   <p className="text-[10px] text-on-surface-variant">finpilot700@gmail.com</p>
                 </div>
-                <button onClick={() => {setShowProfileMenu(false); navigate('/integrations')}} className="w-full text-left px-md py-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low transition-colors flex items-center gap-sm">
+                <button onClick={() => {setShowProfileMenu(false); navigate('/settings')}} className="w-full text-left px-md py-sm text-body-sm text-on-surface-variant hover:bg-surface-container-low transition-colors flex items-center gap-sm">
                   <span className="material-symbols-outlined text-[18px]">settings</span>
                   Settings
                 </button>

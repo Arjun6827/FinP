@@ -1,58 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function QuickCaptureScreen() {
   const router = useRouter();
   const [permission, requestPermission] = useCameraPermissions();
   const [facing, setFacing] = useState<'back' | 'front'>('back');
   const [loading, setLoading] = useState(false);
-  const [syncing, setSyncing] = useState(false);
   const cameraRef = useRef<CameraView>(null);
 
-  useEffect(() => {
-    processQueue();
-  }, []);
-
-  const processQueue = async () => {
-    try {
-      const existingQueue = await AsyncStorage.getItem('upload_queue');
-      if (!existingQueue) return;
-      
-      const queue = JSON.parse(existingQueue);
-      if (queue.length === 0) return;
-
-      setSyncing(true);
-      console.log(`Processing ${queue.length} queued items...`);
-      
-      const remainingQueue = [];
-      let successCount = 0;
-
-      for (const item of queue) {
-        const success = await tryUpload(item.uri);
-        if (success) {
-          successCount++;
-        } else {
-          remainingQueue.push(item);
-        }
-      }
-
-      await AsyncStorage.setItem('upload_queue', JSON.stringify(remainingQueue));
-      
-      if (successCount > 0) {
-        Alert.alert('Sync Complete', `Successfully synced ${successCount} offline receipts!`);
-      }
-    } catch (err) {
-      console.error('Failed to process queue:', err);
-    } finally {
-      setSyncing(false);
-    }
-  };
-
-  const tryUpload = async (uri: string) => {
+  const silentTryUpload = async (uri: string) => {
     const formData = new FormData();
     formData.append('from', 'Mobile App (Offline Sync)');
     formData.append('subject', 'Receipt from Mobile');
@@ -81,6 +42,46 @@ export default function QuickCaptureScreen() {
     }
   };
 
+  const silentProcessQueue = async () => {
+    try {
+      const existingQueue = await AsyncStorage.getItem('upload_queue');
+      if (!existingQueue) return;
+      
+      const queue = JSON.parse(existingQueue);
+      if (queue.length === 0) return;
+
+      console.log(`[Silent Sync] Processing ${queue.length} queued items...`);
+      
+      const remainingQueue = [];
+      let successCount = 0;
+
+      for (const item of queue) {
+        const success = await silentTryUpload(item.uri);
+        if (success) {
+          successCount++;
+        } else {
+          remainingQueue.push(item);
+        }
+      }
+
+      await AsyncStorage.setItem('upload_queue', JSON.stringify(remainingQueue));
+      
+      if (successCount > 0) {
+        console.log(`[Silent Sync] Successfully synced ${successCount} items.`);
+      }
+    } catch (err) {
+      console.log('[Silent Sync] Failed to process queue:', err);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      silentProcessQueue();
+      const interval = setInterval(() => silentProcessQueue(), 5000);
+      return () => clearInterval(interval);
+    }, [])
+  );
+
   if (!permission) {
     return <View />;
   }
@@ -107,7 +108,8 @@ export default function QuickCaptureScreen() {
       });
       
       if (photo && photo.uri) {
-        await uploadImage(photo.uri);
+        // Fire and forget upload to avoid blocking the camera
+        uploadImage(photo.uri);
       }
     } catch (err) {
       console.error('Failed to take photo:', err);
@@ -185,8 +187,8 @@ export default function QuickCaptureScreen() {
           {/* AI Chip */}
           <View style={styles.chipContainer}>
             <View style={styles.aiChip}>
-              <MaterialCommunityIcons name={syncing ? "sync" : "auto-fix"} size={14} color="#0058be" />
-              <Text style={styles.aiChipText}>{syncing ? "SYNCING QUEUE..." : "AUTO-DETECTING"}</Text>
+              <MaterialCommunityIcons name="auto-fix" size={14} color="#0058be" />
+              <Text style={styles.aiChipText}>AUTO-DETECTING</Text>
             </View>
           </View>
 
@@ -203,10 +205,10 @@ export default function QuickCaptureScreen() {
                 <Text style={styles.chipText}>Position Receipt Within Frame</Text>
               </View>
 
-              {(loading || syncing) && (
+              {loading && (
                 <View style={styles.loadingOverlay}>
                   <ActivityIndicator size="large" color="#0058be" />
-                  <Text style={{ color: 'white', marginTop: 10 }}>{syncing ? "Syncing..." : "Uploading..."}</Text>
+                  <Text style={{ color: 'white', marginTop: 10 }}>Uploading...</Text>
                 </View>
               )}
             </View>
@@ -224,16 +226,16 @@ export default function QuickCaptureScreen() {
               </TouchableOpacity>
 
               {/* Shutter */}
-              <TouchableOpacity style={styles.shutterButton} onPress={takePhoto} disabled={loading || syncing}>
-                <View style={[styles.shutterInner, (loading || syncing) && { backgroundColor: '#ccc' }]} />
+              <TouchableOpacity style={styles.shutterButton} onPress={takePhoto} disabled={loading}>
+                <View style={[styles.shutterInner, loading && { backgroundColor: '#ccc' }]} />
               </TouchableOpacity>
 
               {/* Mode */}
-              <TouchableOpacity style={styles.bottomButton} onPress={processQueue}>
+              <TouchableOpacity style={styles.bottomButton} onPress={() => Alert.alert('OCR Mode', 'AI auto-detection is always active!')}>
                 <View style={styles.iconBg}>
-                  <MaterialCommunityIcons name="sync" size={24} color="white" />
+                  <MaterialCommunityIcons name="auto-fix" size={24} color="white" />
                 </View>
-                <Text style={styles.buttonLabel}>Force Sync</Text>
+                <Text style={styles.buttonLabel}>OCR Mode</Text>
               </TouchableOpacity>
             </View>
 

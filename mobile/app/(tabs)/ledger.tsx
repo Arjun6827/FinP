@@ -24,10 +24,12 @@ export default function LedgerScreen() {
 
   useEffect(() => {
     fetchData();
+    const interval = setInterval(() => fetchData(true), 5000);
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = async (isSilent = false) => {
+    if (!isSilent) setLoading(true);
     try {
       const res = await fetch('http://192.168.1.9:5000/api/inbox');
       const json = await res.json();
@@ -52,15 +54,17 @@ export default function LedgerScreen() {
         await AsyncStorage.setItem('cached_transactions', JSON.stringify(mapped));
       }
     } catch (err) {
-      console.error('Failed to fetch ledger data:', err);
-      // Load from cache if available
+      console.log('Failed to fetch ledger data (offline mode active)');
+      
       const cached = await AsyncStorage.getItem('cached_transactions');
       if (cached) {
         setTransactions(JSON.parse(cached));
-        Alert.alert('Offline Mode', 'Showing cached data. Reconnect to see latest updates.');
+      }
+      if (!isSilent) {
+        Alert.alert('Offline Mode', 'You are currently offline or server is unreachable. Showing last known data.');
       }
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
     }
   };
 
@@ -88,7 +92,8 @@ export default function LedgerScreen() {
         Alert.alert('Deleted', 'Transaction has been deleted.');
       }
     } catch (err) {
-      console.error('Failed to delete:', err);
+      console.log('Failed to delete (offline):', err.message);
+      Alert.alert('Offline Mode', 'Cannot delete transactions while offline.');
     }
   };
 
@@ -105,7 +110,8 @@ export default function LedgerScreen() {
         Alert.alert('Moved', 'Transaction moved back to review queue.');
       }
     } catch (err) {
-      console.error('Failed to move:', err);
+      console.log('Failed to move (offline):', err.message);
+      Alert.alert('Offline Mode', 'Cannot move transactions while offline.');
     }
   };
 
@@ -133,8 +139,8 @@ export default function LedgerScreen() {
         fetchData();
       }
     } catch (err) {
-      console.error('Failed to update:', err);
-      Alert.alert('Error', 'Failed to update transaction.');
+      console.log('Failed to update (offline):', err.message);
+      Alert.alert('Offline Mode', 'Cannot update transactions while offline.');
     }
   };
 

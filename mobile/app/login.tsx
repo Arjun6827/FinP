@@ -3,10 +3,13 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput } from 'reac
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as LocalAuthentication from 'expo-local-authentication';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
 
 export default function LoginScreen() {
   const router = useRouter();
   const [showPasswordInput, setShowPasswordInput] = useState(false);
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleBiometricLogin = async () => {
@@ -42,12 +45,19 @@ export default function LoginScreen() {
     }
   };
 
-  const handlePasswordLogin = () => {
+  const handlePasswordLogin = async () => {
     if (showPasswordInput) {
-      if (password === '1234') {
+      if (!email || !password) {
+        Alert.alert('Error', 'Please enter both email and password.');
+        return;
+      }
+      
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
         router.replace('/(tabs)');
-      } else {
-        Alert.alert('Incorrect Password', 'Please enter the correct password (Hint: 1234).');
+      } catch (err: any) {
+        console.error(err);
+        Alert.alert('Login Failed', err.message || 'Failed to login');
       }
     } else {
       setShowPasswordInput(true);
@@ -94,13 +104,21 @@ export default function LoginScreen() {
           ) : (
             <View style={{ width: '100%', gap: 12 }}>
               <TextInput
+                placeholder="Enter Email"
+                placeholderTextColor="#5c647a"
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+              <TextInput
                 placeholder="Enter Password"
                 placeholderTextColor="#5c647a"
                 secureTextEntry
                 style={styles.input}
                 value={password}
                 onChangeText={setPassword}
-                keyboardType="numeric"
               />
               <TouchableOpacity style={styles.primaryButton} onPress={handlePasswordLogin}>
                 <Text style={styles.primaryButtonText}>Login</Text>

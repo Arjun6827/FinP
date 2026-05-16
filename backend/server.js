@@ -8,6 +8,7 @@ import FormData from 'form-data';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import { ImapFlow } from 'imapflow';
 
 dotenv.config();
 
@@ -74,6 +75,60 @@ const upload = multer({ storage: storage });
 // Health Check
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'FinPilot Backend is running' });
+});
+
+// 📧 POST /api/test-imap — Test IMAP connectivity
+app.post('/api/test-imap', async (req, res) => {
+  const { host, port, username, password } = req.body;
+  
+  if (!host || !port || !username || !password) {
+    return res.status(400).json({ success: false, message: 'All fields are required' });
+  }
+  
+  const client = new ImapFlow({
+    host: host,
+    port: parseInt(port),
+    secure: true,
+    auth: {
+      user: username,
+      pass: password
+    },
+    logger: false
+  });
+  
+  try {
+    await client.connect();
+    await client.logout();
+    res.status(200).json({ success: true, message: 'Successfully connected to IMAP server!' });
+  } catch (err) {
+    console.error('IMAP Test Error:', err);
+    res.status(500).json({ success: false, message: `Failed to connect: ${err.message}` });
+  }
+});
+
+// 📧 POST /api/save-imap — Save IMAP configuration
+app.post('/api/save-imap', async (req, res) => {
+  const { host, port, username, password } = req.body;
+  
+  if (!host || !port || !username || !password) {
+    return res.status(400).json({ success: false, message: 'All fields are required' });
+  }
+  
+  try {
+    // Save to a settings collection or a specific doc
+    await db.collection('settings').doc('imap').set({
+      host,
+      port: parseInt(port),
+      username,
+      password, // In a real app, encrypt this!
+      updatedAt: new Date()
+    });
+    
+    res.status(200).json({ success: true, message: 'IMAP configuration saved successfully!' });
+  } catch (err) {
+    console.error('Save IMAP Error:', err);
+    res.status(500).json({ success: false, message: `Failed to save configuration: ${err.message}` });
+  }
 });
 
 // 🔐 GET /api/inbox  — Read Firestore inbox, decrypt sensitive fields, return plaintext

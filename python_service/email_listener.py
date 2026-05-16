@@ -23,11 +23,68 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 # Gemini Setup
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel('gemini-3.1-flash-lite')
+model_instance = None
 
-GMAIL_USER = os.getenv("GMAIL_USER")
-GMAIL_PASS = os.getenv("GMAIL_PASS")
+def get_gemini_model():
+    global model_instance
+    if model_instance is not None:
+        return model_instance
+        
+    try:
+        # Read from Firestore
+        doc_ref = db.collection('settings').document('gemini')
+        doc = doc_ref.get()
+        api_key = None
+        
+        if doc.exists:
+            api_key = doc.to_dict().get('apiKey')
+            print("Using Gemini API Key from Firestore", flush=True)
+        
+        if not api_key:
+            api_key = os.getenv("GEMINI_API_KEY")
+            print("Using Gemini API Key from Environment", flush=True)
+            
+        if api_key:
+            genai.configure(api_key=api_key)
+            model_instance = genai.GenerativeModel('gemini-3.1-flash-lite')
+            return model_instance
+        else:
+            print("WARNING: Gemini API Key not found!", flush=True)
+            return None
+    except Exception as e:
+        print(f"Error loading Gemini key from Firestore: {e}", flush=True)
+        # Fallback to env
+        api_key = os.getenv("GEMINI_API_KEY")
+        if api_key:
+            genai.configure(api_key=api_key)
+            model_instance = genai.GenerativeModel('gemini-3.1-flash-lite')
+            return model_instance
+        return None
+
+def get_imap_config():
+    try:
+        doc_ref = db.collection('settings').document('imap')
+        doc = doc_ref.get()
+        if doc.exists:
+            data = doc.to_dict()
+            print("Using IMAP config from Firestore", flush=True)
+            return {
+                'host': data.get('host', 'imap.gmail.com'),
+                'port': int(data.get('port', 993)),
+                'username': data.get('username'),
+                'password': data.get('password')
+            }
+    except Exception as e:
+        print(f"Error loading IMAP config from Firestore: {e}", flush=True)
+        
+    # Fallback
+    print("Using IMAP config from Environment", flush=True)
+    return {
+        'host': 'imap.gmail.com',
+        'port': 993,
+        'username': os.getenv("GMAIL_USER"),
+        'password': os.getenv("GMAIL_PASS")
+    }
 
 app = Flask(__name__)
 CORS(app)
@@ -53,6 +110,11 @@ def extract_data_with_gemini(image_data, mime_type):
     }
     """
     try:
+        model = get_gemini_model()
+        if not model:
+            print("Gemini model not available", flush=True)
+            return None
+            
         response = model.generate_content([
             prompt,
             {'mime_type': mime_type, 'data': image_data}
@@ -112,10 +174,15 @@ def manual_extract():
 # --- Email Listener Logic ---
 
 def check_email():
+    config = get_imap_config()
+    if not config['username'] or not config['password']:
+        print("IMAP credentials not configured. Skipping check.", flush=True)
+        return
+        
     try:
-        print("Connecting to Gmail IMAP...", flush=True)
-        mail = imaplib.IMAP4_SSL("imap.gmail.com")
-        mail.login(GMAIL_USER, GMAIL_PASS)
+        print(f"Connecting to IMAP server {config['host']}...", flush=True)
+        mail = imaplib.IMAP4_SSL(config['host'], config['port'])
+        mail.login(config['username'], config['password'])
         mail.select("inbox")
 
         # Search for unseen emails
@@ -202,7 +269,7 @@ def check_email():
         print(f"Email Listener Error: {mask(str(e))}", flush=True)
 
 def email_worker():
-    print(f"FinPilot Email Worker started for {GMAIL_USER}...", flush=True)
+    print(f"FinPilot Email Worker started...", flush=True)
     while True:
         # Acquire lock before checking email to prevent race with manual sync
         with email_check_lock:

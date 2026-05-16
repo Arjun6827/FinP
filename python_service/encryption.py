@@ -28,14 +28,38 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-_KEY = os.getenv("FINPILOT_ENCRYPTION_KEY")
-if not _KEY:
-    raise EnvironmentError(
-        "FINPILOT_ENCRYPTION_KEY is not set in .env. "
-        "Generate one with: python -c \"from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())\""
-    )
+_fernet_instance = None
 
-_fernet = Fernet(_KEY.encode())
+def get_fernet():
+    global _fernet_instance
+    if _fernet_instance is not None:
+        return _fernet_instance
+        
+    # Try Firestore
+    try:
+        from firebase_admin import firestore
+        db = firestore.client()
+        doc = db.collection('settings').document('encryption').get()
+        if doc.exists:
+            key = doc.to_dict().get('key')
+            if key:
+                print("Using Encryption Key from Firestore", flush=True)
+                _fernet_instance = Fernet(key.encode())
+                return _fernet_instance
+    except Exception as e:
+        print(f"Error loading encryption key from Firestore: {e}", flush=True)
+        
+    # Fallback to env
+    key = os.getenv("FINPILOT_ENCRYPTION_KEY")
+    if key:
+        print("Using Encryption Key from Environment", flush=True)
+        _fernet_instance = Fernet(key.encode())
+        return _fernet_instance
+        
+    raise EnvironmentError(
+        "No encryption key found! Please set FINPILOT_ENCRYPTION_KEY in .env "
+        "or create a 'settings/encryption' document in Firestore with a 'key' field."
+    )
 
 
 def encrypt_extracted_data(data: dict) -> str:
@@ -44,7 +68,7 @@ def encrypt_extracted_data(data: dict) -> str:
     and returns a Fernet-encrypted base64 token (safe to store in Firestore).
     """
     plaintext = json.dumps(data, ensure_ascii=False).encode("utf-8")
-    token = _fernet.encrypt(plaintext)
+    token = get_fernet().encrypt(plaintext)
     return token.decode("utf-8")   # store as string in Firestore
 
 
@@ -53,7 +77,7 @@ def decrypt_extracted_data(token: str) -> dict:
     Accepts the Fernet token stored in Firestore and returns the original dict.
     Raises InvalidToken if the token has been tampered with.
     """
-    plaintext = _fernet.decrypt(token.encode("utf-8"))
+    plaintext = get_fernet().decrypt(token.encode("utf-8"))
     return json.loads(plaintext.decode("utf-8"))
 
 
