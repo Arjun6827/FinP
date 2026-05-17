@@ -13,7 +13,25 @@ export default function Overview() {
     monthlySpend: 0
   });
   const [recentActivity, setRecentActivity] = useState([]);
+  const [nextPendingItem, setNextPendingItem] = useState(null);
+  const [decryptedMap, setDecryptedMap] = useState({});
   const [loading, setLoading] = useState(true);
+
+  const fetchDecryptedData = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/inbox');
+      const json = await res.json();
+      if (json.success) {
+        const map = {};
+        json.items.forEach(item => {
+          map[item.id] = item.ocrResults?.[0]?.data || {};
+        });
+        setDecryptedMap(map);
+      }
+    } catch (err) {
+      console.error('Failed to fetch decrypted inbox:', err);
+    }
+  };
   const [chartRange, setChartRange] = useState('30');
   const [isUploading, setIsUploading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -70,6 +88,7 @@ export default function Overview() {
     // Listen to the inbox collection
     const q = query(collection(db, 'inbox'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
+      fetchDecryptedData();
       let pending = 0;
       let approvedCount = 0;
       let spend = 0;
@@ -96,6 +115,7 @@ export default function Overview() {
         monthlySpend: spend
       });
       setRecentActivity(items.slice(0, 5));
+      setNextPendingItem(items.find(i => i.status === 'needs_review') || null);
       setLoading(false);
     }, (error) => {
       console.error("Error fetching overview data:", error);
@@ -317,8 +337,7 @@ export default function Overview() {
                 <div onClick={() => navigate('/review')} className="relative group cursor-pointer overflow-hidden rounded-lg border border-outline-variant mb-md">
                   <div className="w-full h-40 bg-surface-container flex items-center justify-center relative overflow-hidden">
                     {(() => {
-                      const item = recentActivity.find(i => i.status === 'needs_review');
-                      const fileUrl = item?.ocrResults?.[0]?.fileUrl || '';
+                      const fileUrl = nextPendingItem?.ocrResults?.[0]?.fileUrl || '';
                       if (fileUrl.toLowerCase().endsWith('.pdf')) {
                         return (
                           <iframe 
@@ -341,12 +360,28 @@ export default function Overview() {
                   </div>
                   <div className="absolute inset-0 bg-on-surface/5 group-hover:bg-transparent transition-colors"></div>
                   <div className="absolute bottom-md left-md bg-white/90 backdrop-blur-sm px-sm py-xs rounded text-[10px] font-bold text-on-surface border border-outline-variant shadow-sm">
-                      {formatCurrency(recentActivity.find(i => i.status === 'needs_review')?.ocrResults?.[0]?.data?.amount || 0)}
+                      {(() => {
+                        const ocrData = nextPendingItem ? (decryptedMap[nextPendingItem.id] || nextPendingItem.ocrResults?.[0]?.data || {}) : {};
+                        const amt = ocrData.amount;
+                        if (typeof amt === 'string') {
+                          const cleaned = amt.replace(/[^0-9.]/g, '');
+                          return formatCurrency(parseFloat(cleaned) || 0);
+                        }
+                        return formatCurrency(amt || 0);
+                      })()}
                   </div>
                 </div>
                 <div className="space-y-sm">
-                  <p className="font-body-md font-semibold text-on-surface">{recentActivity.find(i => i.status === 'needs_review')?.ocrResults?.[0]?.data?.vendor || 'Pending Document'}</p>
-                  <button onClick={() => navigate('/review')} className="w-full mt-md bg-on-secondary-fixed text-white font-body-sm font-bold py-sm rounded-lg hover:bg-on-secondary-fixed-variant transition-colors">Review Item</button>
+                  <p className="font-body-md font-semibold text-on-surface">
+                    {(() => {
+                      const ocrData = nextPendingItem ? (decryptedMap[nextPendingItem.id] || nextPendingItem.ocrResults?.[0]?.data || {}) : {};
+                      return ocrData.fields?.['Customer Name'] || 
+                             ocrData.fields?.['Vendor Name'] || 
+                             ocrData.vendor || 
+                             'Pending Document';
+                    })()}
+                  </p>
+                  <button onClick={() => navigate(`/review?id=${nextPendingItem?.id}`)} className="w-full mt-md bg-on-secondary-fixed text-white font-body-sm font-bold py-sm rounded-lg hover:bg-on-secondary-fixed-variant transition-colors">Review Item</button>
                 </div>
               </>
             ) : (
